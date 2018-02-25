@@ -15,7 +15,7 @@ IntegerMatrix graph::get_fixed(){return fixed;};
 
 void graph::init(IntegerMatrix x0, IntegerMatrix f){
 
-  x = x0;
+  x = clone(x0);
   nrow = x.nrow(); ncol = x.ncol();
   zeroNums = std::vector<int>(nrow+ncol,0);
   oneNums = std::vector<int>(nrow+ncol, 0);
@@ -54,14 +54,18 @@ void graph::init(IntegerMatrix x0, IntegerMatrix f){
 
     std::uniform_int_distribution<int> dist(0, oneNums[i]-1);
     oneSampler.push_back(dist);
-    std::uniform_int_distribution<int> dist(0, zeroNums[i]-1);
-    zeroSampler.push_back(dist);
     if(oneNums[i] == 0)
       weights[i] = 0.0;
     else
       weights[i] = 1.0;
-
   }
+
+  for(int i=0; i<nrow+ncol; i++){
+    std::uniform_int_distribution<int> dist(0, zeroNums[i]-1);
+    zeroSampler.push_back(dist);
+  }
+
+
   one_dist = std::discrete_distribution<int> (weights.begin(), weights.end());
 
 }
@@ -94,11 +98,11 @@ void graph::update_x(){
 // create matrix by cycling through both zeros and ones
   for(int i=0; i<nrow;i++){
     for(int j=0; j<zeroNums[i];j++)
-      x(i,zeros[i][j]-nrow+1) = 0;
+      x(i,zeros[i][j]-nrow) = 0;
   }
   for(int i=0; i<nrow;i++){
     for(int j=0; j<oneNums[i];j++)
-      x(i,ones[i][j]-nrow+1) = 1;
+      x(i,ones[i][j]-nrow) = 1;
   }
 }
 

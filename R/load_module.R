@@ -1,2 +1,1 @@
-loadModule("btable", TRUE)
-loadModule("ctable", TRUE)
+loadModule("graph", TRUE)

@@ -6,16 +6,14 @@
 using namespace Rcpp;
 
 
-RcppExport SEXP _rcpp_module_boot_btable();
-RcppExport SEXP _rcpp_module_boot_ctable();
+RcppExport SEXP _rcpp_module_boot_graph();
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_rcpp_module_boot_btable", (DL_FUNC) &_rcpp_module_boot_btable, 0},
-    {"_rcpp_module_boot_ctable", (DL_FUNC) &_rcpp_module_boot_ctable, 0},
+    {"_rcpp_module_boot_graph", (DL_FUNC) &_rcpp_module_boot_graph, 0},
     {NULL, NULL, 0}
 };
 
-RcppExport void R_init_tables(DllInfo *dll) {
+RcppExport void R_init_graphs(DllInfo *dll) {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
 }
