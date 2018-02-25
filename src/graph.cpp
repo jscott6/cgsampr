@@ -67,61 +67,6 @@ void graph::init(IntegerMatrix x0, IntegerMatrix f){
 }
 
 
-
-
-/*
-void graph::init(IntegerMatrix x0, IntegerMatrix f){
-
-  x = x0;
-  nrow = x.nrow(); ncol = x.ncol();
-  rowNums = std::vector<int>(nrow,0);
-  colNums = std::vector<int>(ncol, 0);
-  rows = std::vector<std::vector<int> > (nrow, std::vector<int>(0));
-  cols = std::vector<std::vector<int> > (ncol, std::vector<int>(0));
-  std::vector<double> weights(ncol);
-  unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-  generator = std::default_random_engine(seed);
-
-  //preprocess f to ensure all neccessarily fixed values have been determined
-  scc_graph G(x0,f);
-  fixed = G.fixed_values(f);
-  fixed = f;
-
-  for(int i=0;i<nrow;i++){
-    for(int j=0;j<ncol;j++){
-      // only add to data structure if not known
-      if(fixed(i,j) == 0){
-        if(x(i,j) == 0){
-          rows[i].push_back(j);
-          rowNums[i]++;
-        }
-        else{
-          cols[j].push_back(i);
-          colNums[j]++;
-        }
-      }
-    }
-  }
-
-  for(int j=0; j<ncol; j++){
-
-    std::uniform_int_distribution<int> dist(0, colNums[j]-1);
-    colSampler.push_back(dist);
-
-    if(colNums[j] == 0)
-      weights[j] = 0.0;
-    else
-      weights[j] = 1.0;
-  }
-  col_dist = std::discrete_distribution<int> (weights.begin(), weights.end());
-
-  for(int i=0;i<nrow;i++){
-    std::uniform_int_distribution<int> dist(0,rowNums[i]-1);
-    rowSampler.push_back(dist);
-  }
-}
-*/
-
 graph::graph(IntegerMatrix x0, IntegerMatrix f){
   init(x0,f);
 }
@@ -146,48 +91,48 @@ graph::graph(IntegerVector r, IntegerVector c, IntegerMatrix f){
 
 // recreates x from data structure
 void graph::update_x(){
-// create matrix by cycling through both rows and cols
+// create matrix by cycling through both zeros and ones
   for(int i=0; i<nrow;i++){
-    for(int j=0; j<rowNums[i];j++)
-      x(i,rows[i][j]) = 0;
+    for(int j=0; j<zeroNums[i];j++)
+      x(i,zeros[i][j]-nrow+1) = 0;
   }
-  for(int j= 0; j<ncol;j++){
-    for(int i=0; i<colNums[j];i++)
-      x(cols[j][i],j) = 1;
-  }
+  for(int i=0; i<nrow;i++){
+    for(int j=0; j<oneNums[i];j++)
+      x(i,ones[i][j]-nrow+1) = 1;
+  }  
 }
 
 // generates one sample matrix
 void graph::sample_step(){
 
   // sample column randomly
-  int j1 = col_dist(generator);
-  int i1_idx = colSampler[j1](generator);
-  int j = j1, i = cols[j1][i1_idx];
+  int j1 = one_dist(generator);
+  int i1_idx = oneSampler[j1](generator);
+  int j = j1, i = ones[j1][i1_idx];
   int i_ind, j_ind;
 
   while(true){
-    // sample j_k from rows i_{k-1}
-    j_ind = rowSampler[i](generator);
-    std::swap(j, rows[i][j_ind]);
+    // sample j_k from zeros i_{k-1}
+    j_ind = zeroSampler[i](generator);
+    std::swap(j, zeros[i][j_ind]);
 
     if(j == j1) break;
 
-    // sample i_k from cols j_{k}
-    i_ind = colSampler[j](generator);
-    std::swap(i, cols[j][i_ind]);
+    // sample i_k from ones j_{k}
+    i_ind = oneSampler[j](generator);
+    std::swap(i, ones[j][i_ind]);
   }
-  // need to change cols i1 from j1 to jk
-  cols[j1][i1_idx] = i;
+  // need to change ones i1 from j1 to jk
+  ones[j1][i1_idx] = i;
 }
 
 
 List graph::sample_step_show_workings(unsigned int max_size){
 
   // sample column randomly
-  int j1 = col_dist(generator);
-  int i1_idx = colSampler[j1](generator);
-  int j = j1, i = cols[j1][i1_idx];
+  int j1 = one_dist(generator);
+  int i1_idx = oneSampler[j1](generator);
+  int j = j1, i = ones[j1][i1_idx];
   int i1 = i;
   int i_ind, j_ind;
   List results(max_size);
@@ -197,9 +142,9 @@ List graph::sample_step_show_workings(unsigned int max_size){
   int l = 0;
   while(true){
     l = l+1;
-    // sample j_k from rows i_{k-1}
-    j_ind = rowSampler[i](generator);
-    std::swap(j, rows[i][j_ind]);
+    // sample j_k from zeros i_{k-1}
+    j_ind = zeroSampler[i](generator);
+    std::swap(j, zeros[i][j_ind]);
     update_x();
     x(i1,j1) = 0;
     results(l) = clone(x);
@@ -207,15 +152,15 @@ List graph::sample_step_show_workings(unsigned int max_size){
     if(j == j1) break;
     l = l+1;
 
-    // sample i_k from cols j_{k}
-    i_ind = colSampler[j](generator);
-    std::swap(i, cols[j][i_ind]);
+    // sample i_k from ones j_{k}
+    i_ind = oneSampler[j](generator);
+    std::swap(i, ones[j][i_ind]);
     update_x();
     x(i1,j1) = 0;
     results(l) = clone(x);
   }
-  // need to change cols i1 from j1 to jk
-  cols[j1][i1_idx] = i;
+  // need to change ones i1 from j1 to jk
+  ones[j1][i1_idx] = i;
   update_x();
   x(i1,j1) = 0;
   l = l+1;
@@ -244,16 +189,16 @@ Rcpp::IntegerMatrix graph::get_x(){
 
 
 void graph::print_data(){
-  Rcout << "Rows with 1s: " << std::endl;
+  Rcout << "zeros with 1s: " << std::endl;
   for(int i=0; i<ncol;i++){
     Rcout << "Column " << i+1 << ": ";
-    printVec(cols[i]);
+    printVec(ones[i]);
   }
   Rcout << std::endl;
   Rcout << "Columns with 0s: " << std::endl;
   for(int i=0; i<nrow;i++){
     Rcout << "Row " << i+1 << ": ";
-    printVec(rows[i]);
+    printVec(zeros[i]);
   }
   Rcout << std::endl;
   return;
