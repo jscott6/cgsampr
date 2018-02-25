@@ -7,13 +7,13 @@
 
 using namespace Rcpp;
 
-IntegerMatrix digraph::get_fixed(){return fixed;};
+IntegerMatrix graph::get_fixed(){return fixed;};
 
 
 
 // initialisation for the digraph...
 
-void digraph::init(IntegerMatrix x0, IntegerMatrix f){
+void graph::init(IntegerMatrix x0, IntegerMatrix f){
 
   x = x0;
   nrow = x.nrow(); ncol = x.ncol();
@@ -71,7 +71,7 @@ void digraph::init(IntegerMatrix x0, IntegerMatrix f){
 
 
 /*
-void digraph::init(IntegerMatrix x0, IntegerMatrix f){
+void graph::init(IntegerMatrix x0, IntegerMatrix f){
 
   x = x0;
   nrow = x.nrow(); ncol = x.ncol();
@@ -123,13 +123,13 @@ void digraph::init(IntegerMatrix x0, IntegerMatrix f){
 }
 */
 
-digraph::digraph(IntegerMatrix x0, IntegerMatrix f){
+graph::graph(IntegerMatrix x0, IntegerMatrix f){
   init(x0,f);
 }
 
 // constructor utilising max flow (Edmund Karps) algorithm to attempt to
 // reconstruct an admissible matrix from provided marginals.
-digraph::digraph(IntegerVector r, IntegerVector c, IntegerMatrix f){
+graph::graph(IntegerVector r, IntegerVector c, IntegerMatrix f){
 
   IntegerMatrix x0(r.size(),c.size());
   bool sinkfound=true;
@@ -146,7 +146,7 @@ digraph::digraph(IntegerVector r, IntegerVector c, IntegerMatrix f){
 
 
 // recreates x from data structure
-void digraph::update_x(){
+void graph::update_x(){
 // create matrix by cycling through both rows and cols
   for(int i=0; i<nrow;i++){
     for(int j=0; j<rowNums[i];j++)
@@ -159,7 +159,7 @@ void digraph::update_x(){
 }
 
 // generates one sample matrix
-void digraph::sample_step(){
+void graph::sample_step(){
 
   // sample column randomly
   int j1 = col_dist(generator);
@@ -183,7 +183,7 @@ void digraph::sample_step(){
 }
 
 
-List digraph::sample_step_show_workings(unsigned int max_size){
+List graph::sample_step_show_workings(unsigned int max_size){
 
   // sample column randomly
   int j1 = col_dist(generator);
@@ -224,7 +224,7 @@ List digraph::sample_step_show_workings(unsigned int max_size){
   return results;
 }
 
-List digraph::sample(int nsamples=1e4, int thin = 20, int burnin = 1e4){
+List graph::sample(int nsamples=1e4, int thin = 20, int burnin = 1e4){
 
   srand(time(NULL));
   List results(nsamples);
@@ -244,7 +244,7 @@ Rcpp::IntegerMatrix btable::get_x(){
 }
 
 
-void digraph::print_data(){
+void graph::print_data(){
   Rcout << "Rows with 1s: " << std::endl;
   for(int i=0; i<ncol;i++){
     Rcout << "Column " << i+1 << ": ";
