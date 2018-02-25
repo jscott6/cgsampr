@@ -1,0 +1,3 @@
+useDynLib(graphs)
+exportPattern("^[[:alpha:]]+")
+import(methods, Rcpp)

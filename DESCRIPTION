@@ -1,0 +1,11 @@
+Package: graphs
+Type: Package
+Title: Provides efficient MCMC methods for sampling zero-one and contingency tables with fixed marginals and arbitrary fixed table entries.
+Version: 1.0
+Date: 2017-12-02
+Author: James Scott
+Maintainer: James Scott <jas15@ic.ac.uk>
+Description: This package provides an efficient object oriented implementation of novel MCMC methods for sampling random graphs uniformly conditional on observed vertex degrees, and a specified set of arcs/edges. These techniques find application in motif detection and hypothesis testing. 
+License: GPL (>= 2)
+Imports: methods, Rcpp (>= 0.12.14)
+LinkingTo: Rcpp
