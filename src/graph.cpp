@@ -1,6 +1,6 @@
 
 
-#include "btable.h"
+#include "graph.h"
 #include "StronglyConnectedComponents.h"
 #include "FeasibleMatrix.h"
 #include "AuxiliaryFunctions.h"
@@ -21,7 +21,7 @@ void graph::init(IntegerMatrix x0, IntegerMatrix f){
   oneNums = std::vector<int>(nrow+ncol, 0);
   ones = std::vector<std::vector<int> > (nrow+ncol, std::vector<int>(0));
   zeros = std::vector<std::vector<int> > (nrow+ncol, std::vector<int>(0));
-  std::vector<double> weights(ncol);
+  std::vector<double> weights(nrow+ncol);
   unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
   generator = std::default_random_engine(seed);
 
@@ -48,22 +48,21 @@ void graph::init(IntegerMatrix x0, IntegerMatrix f){
       }
     }
   }
-  for(int j=0; j<ncol; j++){
 
-    std::uniform_int_distribution<int> dist(0, colNums[j]-1);
-    colSampler.push_back(dist);
 
-    if(colNums[j] == 0)
-      weights[j] = 0.0;
+  for(int i=0; i<nrow+ncol; i++){
+
+    std::uniform_int_distribution<int> dist(0, oneNums[i]-1);
+    oneSampler.push_back(dist);
+    std::uniform_int_distribution<int> dist(0, zeroNums[i]-1);
+    zeroSampler.push_back(dist);
+    if(oneNums[i] == 0)
+      weights[i] = 0.0;
     else
-      weights[j] = 1.0;
-  }
-  col_dist = std::discrete_distribution<int> (weights.begin(), weights.end());
+      weights[i] = 1.0;
 
-  for(int i=0;i<nrow;i++){
-    std::uniform_int_distribution<int> dist(0,rowNums[i]-1);
-    rowSampler.push_back(dist);
   }
+  one_dist = std::discrete_distribution<int> (weights.begin(), weights.end());
 
 }
 
@@ -238,7 +237,7 @@ List graph::sample(int nsamples=1e4, int thin = 20, int burnin = 1e4){
   return results;
 }
 
-Rcpp::IntegerMatrix btable::get_x(){
+Rcpp::IntegerMatrix graph::get_x(){
   update_x();
   return x;
 }
