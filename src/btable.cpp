@@ -9,6 +9,68 @@ using namespace Rcpp;
 
 IntegerMatrix digraph::get_fixed(){return fixed;};
 
+
+
+// initialisation for the digraph...
+
+void digraph::init(IntegerMatrix x0, IntegerMatrix f){
+
+  x = x0;
+  nrow = x.nrow(); ncol = x.ncol();
+  zeroNums = std::vector<int>(nrow+ncol,0);
+  oneNums = std::vector<int>(nrow+ncol, 0);
+  ones = std::vector<std::vector<int> > (nrow+ncol, std::vector<int>(0));
+  zeros = std::vector<std::vector<int> > (nrow+ncol, std::vector<int>(0));
+  std::vector<double> weights(ncol);
+  unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+  generator = std::default_random_engine(seed);
+
+  //preprocess f to ensure all neccessarily fixed values have been determined
+  scc_graph G(x0,f);
+  fixed = G.fixed_values(f);
+  fixed = f;
+
+  for(int i=0;i<nrow;i++){
+    for(int j=0;j<ncol;j++){
+      if(fixed(i,j)==0){
+        if(x(i,j)==0){
+          zeros[i].push_back(nrow+j);
+          zeroNums[i]++;
+          zeros[nrow+j].push_back(i);
+          zeroNums[nrow+j]++;
+        }
+        else{
+          ones[i].push_back(nrow+j);
+          oneNums[i]++;
+          ones[nrow+j].push_back(i);
+          oneNums[nrow+j]++;
+        }
+      }
+    }
+  }
+  for(int j=0; j<ncol; j++){
+
+    std::uniform_int_distribution<int> dist(0, colNums[j]-1);
+    colSampler.push_back(dist);
+
+    if(colNums[j] == 0)
+      weights[j] = 0.0;
+    else
+      weights[j] = 1.0;
+  }
+  col_dist = std::discrete_distribution<int> (weights.begin(), weights.end());
+
+  for(int i=0;i<nrow;i++){
+    std::uniform_int_distribution<int> dist(0,rowNums[i]-1);
+    rowSampler.push_back(dist);
+  }
+
+}
+
+
+
+
+/*
 void digraph::init(IntegerMatrix x0, IntegerMatrix f){
 
   x = x0;
@@ -59,7 +121,7 @@ void digraph::init(IntegerMatrix x0, IntegerMatrix f){
     rowSampler.push_back(dist);
   }
 }
-
+*/
 
 digraph::digraph(IntegerMatrix x0, IntegerMatrix f){
   init(x0,f);
