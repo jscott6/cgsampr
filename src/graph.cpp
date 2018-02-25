@@ -99,7 +99,7 @@ void graph::update_x(){
   for(int i=0; i<nrow;i++){
     for(int j=0; j<oneNums[i];j++)
       x(i,ones[i][j]-nrow+1) = 1;
-  }  
+  }
 }
 
 // generates one sample matrix
@@ -189,15 +189,15 @@ Rcpp::IntegerMatrix graph::get_x(){
 
 
 void graph::print_data(){
-  Rcout << "zeros with 1s: " << std::endl;
-  for(int i=0; i<ncol;i++){
-    Rcout << "Column " << i+1 << ": ";
+  Rcout << "Ones: " << std::endl;
+  for(int i=0; i<nrow+ncol;i++){
+    Rcout << "Constraint " << i+1 << ": ";
     printVec(ones[i]);
   }
   Rcout << std::endl;
-  Rcout << "Columns with 0s: " << std::endl;
-  for(int i=0; i<nrow;i++){
-    Rcout << "Row " << i+1 << ": ";
+  Rcout << "Zeros: " << std::endl;
+  for(int i=0; i<nrow+ncol;i++){
+    Rcout << "Constraint " << i+1 << ": ";
     printVec(zeros[i]);
   }
   Rcout << std::endl;
