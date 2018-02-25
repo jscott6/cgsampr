@@ -10,8 +10,8 @@
 
 
 struct arc{
-  head;
-  tail;
+  int head;
+  int tail;
 }
 
 class graph_switch{
