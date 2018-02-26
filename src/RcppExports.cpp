@@ -7,11 +7,9 @@ using namespace Rcpp;
 
 
 RcppExport SEXP _rcpp_module_boot_graph();
-RcppExport SEXP _rcpp_module_boot_graph_switch();
 
 static const R_CallMethodDef CallEntries[] = {
     {"_rcpp_module_boot_graph", (DL_FUNC) &_rcpp_module_boot_graph, 0},
-    {"_rcpp_module_boot_graph_switch", (DL_FUNC) &_rcpp_module_boot_graph_switch, 0},
     {NULL, NULL, 0}
 };
 

@@ -112,7 +112,7 @@ graph::graph(IntegerVector r, IntegerVector c, IntegerMatrix f){
 
 
 // employs switch method to sample a single step
-void graph_switch::switch(){
+void graph::switch_step(){
 
   int idx1, idx2;
   std::uniform_int_distribution<int> dist(0, arc_list.size());
@@ -160,7 +160,7 @@ void graph_switch::switch(){
 
 
 // employs switch method to sample a single step
-void graph_switch::DG(){
+void graph::DG_step(){
 
   int idx1, idx2;
   std::uniform_int_distribution<int> dist(0, arc_list.size());
@@ -206,15 +206,15 @@ void graph_switch::DG(){
   return;
 }
 
-void graph_switch::print_arc_list(){
+void graph::print_arc_list(){
   for(std::vector<arc>::iterator it = arc_list.begin(); it!=arc_list.end(); it++)
     Rcout << "(" << it->head +1 << ", " << it->tail+1 << ")" << std::endl;
 }
 
 
-void graph_switch::matching(){
+void graph::matching_step(){
 
-  int discard == 0;
+  int discard = 0;
   int nFreeStubs = nStubs;
 
   // initialise adjacency matrix to zero matrix
@@ -229,17 +229,17 @@ void graph_switch::matching(){
     std::uniform_int_distribution<int> dist(0,nFreeStubs);
     int inIdx = dist(generator);
     int outIdx = dist(generator);
-    int head = instubs[inIdx];
-    int tail = outstubs[outIdx];
+    int head = inStubs[inIdx];
+    int tail = outStubs[outIdx];
 
     // discard if self-loop or arc exists already
     if(head==tail || x(tail,head)==1){
-      discard++
+      discard++;
     }
     else{
       x(tail,head)=1;
       // swap with final entry
-      std::swap(instubs[inIdx], instubs[nFreeStubs]);
+      std::swap(inStubs[inIdx], inStubs[nFreeStubs]);
       nFreeStubs--;
     }
   }
@@ -262,7 +262,7 @@ void graph::update_x(){
 }
 
 
-void graph::SG(){
+void graph::SG_step(){
 
   // sample column randomly
   int j1 = one_dist(generator);
