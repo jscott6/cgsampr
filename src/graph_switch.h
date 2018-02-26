@@ -12,7 +12,7 @@
 struct arc{
   int head;
   int tail;
-}
+};
 
 class graph_switch{
 private:
