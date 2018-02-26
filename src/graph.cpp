@@ -15,20 +15,11 @@ IntegerMatrix graph::get_fixed(){return fixed;};
 
 void graph::init(IntegerMatrix x0, IntegerMatrix f){
 
-  x = clone(x0);
-  nrow = x.nrow(); ncol = x.ncol();
   zeroNums = std::vector<int>(nrow+ncol,0);
   oneNums = std::vector<int>(nrow+ncol, 0);
   ones = std::vector<std::vector<int> > (nrow+ncol, std::vector<int>(0));
   zeros = std::vector<std::vector<int> > (nrow+ncol, std::vector<int>(0));
   std::vector<double> weights(nrow+ncol);
-  unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-  generator = std::default_random_engine(seed);
-
-  //preprocess f to ensure all neccessarily fixed values have been determined
-  scc_graph G(x0,f);
-  fixed = G.fixed_values(f);
-  fixed = f;
 
   for(int i=0;i<nrow;i++){
     for(int j=0;j<ncol;j++){
@@ -49,7 +40,6 @@ void graph::init(IntegerMatrix x0, IntegerMatrix f){
     }
   }
 
-
   for(int i=0; i<nrow+ncol; i++){
 
     std::uniform_int_distribution<int> dist(0, oneNums[i]-1);
@@ -65,13 +55,20 @@ void graph::init(IntegerMatrix x0, IntegerMatrix f){
     zeroSampler.push_back(dist);
   }
 
-
   one_dist = std::discrete_distribution<int> (weights.begin(), weights.end());
 
 }
 
 
 graph::graph(IntegerMatrix x0, IntegerMatrix f){
+  x = clone(x0);
+  nrow = x.nrow(); ncol = x.ncol();
+  unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+  generator = std::default_random_engine(seed);
+  //preprocess f to ensure all neccessarily fixed values have been determined
+  scc_graph G(x0,f);
+  fixed = G.fixed_values(f);
+  fixed = f;
   init(x0,f);
 }
 
