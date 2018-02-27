@@ -6,6 +6,7 @@
 #include <vector>
 #include <algorithm>
 #include <random>
+#include <string>
 
 
 struct arc{
@@ -21,8 +22,9 @@ private:
   void DG_step();
   void SG_step();
   void matching_step();
+  void update_datastructures();
   std::vector<int> oneNums, zeroNums, inStubs, outStubs;
-  std::vector<arc> arc_list;
+  std::vector<arc> arcList;
   std::vector<std::vector<int> > ones, zeros;
   std::discrete_distribution<int> one_dist;
   std::vector<std::uniform_int_distribution<int> > oneSampler, zeroSampler;
@@ -36,11 +38,11 @@ public:
   graph(Rcpp::IntegerVector , Rcpp::IntegerVector , Rcpp::IntegerMatrix );
   Rcpp::IntegerMatrix get_x();
   Rcpp::IntegerMatrix get_fixed();
-  void sample_step();
   Rcpp::List sample_step_show_workings(unsigned int);
-  Rcpp::List sample(int, int, int);
+  Rcpp::List sample(std::string method, int, int, int);
   void print_data();
-  void print_arc_list();
+  void print_arcList();
+  void print_stub_list();
 };
 
 #endif

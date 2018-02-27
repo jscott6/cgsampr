@@ -1,47 +1,48 @@
 
-// employs switch method to sample a single step
+/*
+------------------------------------------------------------
+Implementation of Diaconis-Gangolli (1995)
+------------------------------------------------------------
+*/
+
+
+
+#include "graph.h"
+
+using namespace Rcpp;
+
+// completely state-independent sampling procedure
 void graph::DG_step(){
 
-  int idx1, idx2;
-  std::uniform_int_distribution<int> dist(0, arc_list.size());
+  std::uniform_int_distribution<int> row_dist(0, nrow-1);
+  std::uniform_int_distribution<int> col_dist(0, ncol-1);
 
-  idx1 = dist(generator);
-  idx2 = dist(generator);
+  int i1 = row_dist(generator);
+  int i2 = row_dist(generator);
+  int j1 = col_dist(generator);
+  int j2 = col_dist(generator);
 
-  // edges must be distinct
-  while(idx1 == idx2)
-    idx2 = dist(generator);
-
-  int head1 = arc_list[idx1].head;
-  int head2 = arc_list[idx2].head;
-  int tail1 = arc_list[idx1].tail;
-  int tail2 = arc_list[idx2].tail;
-
-  // delineated vertices must be distinct
-  if(head1==head2 || head1==tail2 || head2==tail1 || tail1==tail2){
+  // ensure we've delineated two rows and columns
+  if(i1==i2 || j1 == j2)
     return;
+  // return if any delineated element is fixed
+  if(fixed(i1,j1)==1 || fixed(i1,j2)==1||fixed(i2,j1)==1||fixed(i2,j2)==1)
+    return;
+
+  // only alter the adjacency matrix if one of the following two patterns is observed
+  // pattern 1
+  if(x(i1,j1)==1 && x(i1,j2)==0 && x(i2,j1)==0 && x(i2,j2)==1){
+    x(i1,j1)=0;
+    x(i1,j2)=1;
+    x(i2,j1)=1;
+    x(i2,j2)=0;
   }
-  // no edges can already exist between heads and tails of different edges
-  if(x(head1,tail2) == 1 || x(head2,tail1) == 1)
-    return;
-
-  // potential edges cannot be fixed...
-  if(fixed(head1,tail2)==1 || fixed(head2,tail1)==1)
-    return;
-
-
-  Rcout << "(" << head1+1 << ", " << tail1+1 << ")" << std::endl;
-  Rcout << "(" << head2+1 << ", " << tail2+1 << ")" << std::endl;
-
-  // update edges
-  arc_list[idx1].tail = tail2;
-  arc_list[idx2].tail = tail1;
-
-  // update x
-  x(head1,tail1) = 0;
-  x(head1,tail2) = 1;
-  x(head2,tail1) = 1;
-  x(head2,tail2) = 0;
-
+  // pattern 2
+  if(x(i1,j1)==0 && x(i1,j2)==1 && x(i2,j1)==1 && x(i2,j2)==0){
+    x(i1,j1)=1;
+    x(i1,j2)=0;
+    x(i2,j1)=0;
+    x(i2,j2)=1;
+  }
   return;
 }

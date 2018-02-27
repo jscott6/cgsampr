@@ -1,4 +1,14 @@
 
+/*
+------------------------------------------------------------
+Implementation of SG algorithm for directed graphs.
+------------------------------------------------------------
+*/
+
+#include "graph.h"
+
+using namespace Rcpp;
+
 void graph::SG_step(){
 
   // sample column randomly
