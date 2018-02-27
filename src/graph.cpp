@@ -14,11 +14,12 @@ data, so it is computationally inefficient to track all data during each
 sampling step.
 */
 
+
 void graph::update_datastructures(){
 
   // initialise the data structures
-  zeroNums = std::vector<int>(nrow+ncol,0);
-  oneNums = std::vector<int>(nrow+ncol, 0);
+  zeroNums = std::vector<int>(nrow,0);
+  oneNums = std::vector<int>(ncol, 0);
   ones = std::vector<std::vector<int> > (nrow, std::vector<int>(0));
   zeros = std::vector<std::vector<int> > (ncol, std::vector<int>(0));
   inStubs = std::vector<int>(0);
@@ -27,31 +28,60 @@ void graph::update_datastructures(){
   nStubs = 0;
 
   // (re)construct them from the current adjacency matrix
-  for(int i=0;i<nrow;i++){
-    for(int j=0;j<ncol;j++){
-      if(fixed(i,j)==0){
-        if(x(i,j)==0){
-          zeros[i].push_back(j);
-          zeroNums[i]++;
-        }
-        else{
-          // add arc to arc list
-          arc e;
-          e.tail = i; e.head = j;
-          arcList.push_back(e);
+  if(directed){
+    for(int i=0;i<nrow;i++){
+      for(int j=0;j<ncol;j++){
+        if(fixed(i,j)==0){
+          if(x(i,j)==0){
+            zeros[i].push_back(j);
+            zeroNums[i]++;
+          }
+          else{
+            // add arc to arc list
+            arc e;
+            e.tail = i; e.head = j;
+            arcList.push_back(e);
 
-          // add stubs for matching method
-          inStubs.push_back(j);
-          outStubs.push_back(i);
-          nStubs++;
+            // add stubs for matching method
+            inStubs.push_back(j);
+            outStubs.push_back(i);
+            nStubs++;
 
-          ones[j].push_back(i);
-          oneNums[j]++;
+            ones[j].push_back(i);
+            oneNums[j]++;
+          }
         }
       }
     }
   }
-
+  else{
+    for(int k=0; k<nrow; k++){
+      for(int i=0: i<k;i++){
+        if(fixed(i,k)==0){
+          if(x(i,k)==0){
+            zeros[k].push_back(i);
+            zeroNums[k]++;
+          }
+          else{
+            ones[k].push_back(i);
+            oneNums[k]++;
+          }
+        }
+      }
+      for(int j=(k+1);j<nrow;j++){
+        if(fixed(k,j)==0){
+          if(x(k,j)==0){
+            zeros[k].push_back(j);
+            zerosNums[k]++;
+          }
+          else{
+            ones[k].push_back(j);
+            oneNums[k]++;
+          }
+        }
+      }
+    }
+  }
 }
 
 /*
@@ -100,7 +130,8 @@ Fixed matrix is determined by finding strongly connected components in D_x
 */
 
 
-graph::graph(IntegerMatrix x0, IntegerMatrix f){
+graph::graph(IntegerMatrix x0, IntegerMatrix f, std::bool digraph = FALSE){
+  directed = digraph;
   init(x0,f);
 }
 
@@ -111,7 +142,9 @@ procedure will be successful if and only if the degree sequence is GRAPHICAL
 */
 
 
-graph::graph(IntegerVector r, IntegerVector c, IntegerMatrix f){
+graph::graph(IntegerVector r, IntegerVector c, IntegerMatrix f, std::bool digraph = FALSE){
+
+  directed = digraph;
 
   IntegerMatrix x0(r.size(),c.size());
   bool sinkfound=true;

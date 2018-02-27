@@ -24,6 +24,7 @@ private:
   void matching_step();
   void update_datastructures();
   std::vector<int> oneNums, zeroNums, inStubs, outStubs;
+  std::bool directed;
   std::vector<arc> arcList;
   std::vector<std::vector<int> > ones, zeros;
   std::discrete_distribution<int> one_dist;
@@ -34,8 +35,8 @@ private:
   Rcpp::IntegerMatrix fixed;
 
 public:
-  graph(Rcpp::IntegerMatrix , Rcpp::IntegerMatrix );
-  graph(Rcpp::IntegerVector , Rcpp::IntegerVector , Rcpp::IntegerMatrix );
+  graph(IntegerMatrix x0, IntegerMatrix f, std::bool digraph = FALSE);
+  graph(IntegerVector r, IntegerVector c, IntegerMatrix f, std::bool digraph = FALSE);
   Rcpp::IntegerMatrix get_x();
   Rcpp::IntegerMatrix get_fixed();
   Rcpp::List sample_step_show_workings(unsigned int);
