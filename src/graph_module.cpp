@@ -17,12 +17,11 @@ RCPP_MODULE(graph){
 
   class_<graph>("graph")
 
-  .constructor<IntegerMatrix,IntegerMatrix>()
-  .constructor<IntegerVector,IntegerVector,IntegerMatrix>()
+  .constructor<IntegerMatrix,IntegerMatrix,bool>()
+  .constructor<IntegerVector,IntegerVector,IntegerMatrix,bool>()
 
   .method("sample", &graph::sample, "Performs MCMC multiple sampling steps as specified by user, return list of tables")
   .method("print_data", &graph::print_data, "Prints internal data structure to R console")
-  .method("sample_step_show_workings", &graph::sample_step_show_workings, "Prints each step of a sampling step...")
   .method("print_stub_list", &graph::print_stub_list, "Prints the list of in-stubs and out-stubs for the matching method")
   .method("print_arcList", &graph::print_arcList, "Prints the data of all arcs in the graph")
   .property("x", &graph::get_x, "Returns current state of table")

@@ -8,14 +8,14 @@
 using namespace Rcpp;
 
 /*
-update_datastructures is used to reconstruct class data from the adjacency
+update_data is used to reconstruct class data from the adjacency
 matrix. This is required as different sampling methods use different class
 data, so it is computationally inefficient to track all data during each
 sampling step.
 */
 
 
-void graph::update_datastructures(){
+void graph::update_data(){
 
   // initialise the data structures
   zeroNums = std::vector<int>(nrow,0);
@@ -56,14 +56,16 @@ void graph::update_datastructures(){
   }
   else{
     for(int k=0; k<nrow; k++){
-      for(int i=0: i<k;i++){
+      for(int i=0; i<k;i++){
         if(fixed(i,k)==0){
           if(x(i,k)==0){
             zeros[k].push_back(i);
+            tracking[i][k][1] = zeroNums[k];
             zeroNums[k]++;
           }
           else{
             ones[k].push_back(i);
+            tracking[i][k][1] = oneNums[k];
             oneNums[k]++;
           }
         }
@@ -72,10 +74,12 @@ void graph::update_datastructures(){
         if(fixed(k,j)==0){
           if(x(k,j)==0){
             zeros[k].push_back(j);
-            zerosNums[k]++;
+            tracking[k][j][0] = zeroNums[k];
+            zeroNums[k]++;
           }
           else{
             ones[k].push_back(j);
+            tracking[k][j][0] = oneNums[k];
             oneNums[k]++;
           }
         }
@@ -94,13 +98,14 @@ void graph::init(IntegerMatrix x0, IntegerMatrix f){
   nrow = x.nrow(); ncol = x.ncol();
   unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
   generator = std::default_random_engine(seed);
+  tracking = std::vector<std::vector<std::vector<int> > >(nrow, std::vector<std::vector<int> >(ncol,std::vector<int>(2,-1)));
   //preprocess f to ensure all neccessarily fixed values have been determined
   scc_graph G(x0,f);
   fixed = G.fixed_values(f);
   fixed = f;
   std::vector<double> weights(ncol);
 
-  update_datastructures();
+  update_data();
 
   for(int j=0; j<ncol; j++){
     std::uniform_int_distribution<int> dist(0, oneNums[j]-1);
@@ -130,7 +135,7 @@ Fixed matrix is determined by finding strongly connected components in D_x
 */
 
 
-graph::graph(IntegerMatrix x0, IntegerMatrix f, std::bool digraph = FALSE){
+graph::graph(IntegerMatrix x0, IntegerMatrix f, bool digraph){
   directed = digraph;
   init(x0,f);
 }
@@ -142,7 +147,7 @@ procedure will be successful if and only if the degree sequence is GRAPHICAL
 */
 
 
-graph::graph(IntegerVector r, IntegerVector c, IntegerMatrix f, std::bool digraph = FALSE){
+graph::graph(IntegerVector r, IntegerVector c, IntegerMatrix f, bool digraph){
 
   directed = digraph;
 
@@ -212,7 +217,7 @@ List graph::sample(std::string method, int nsamples=1e4, int thin = 20, int burn
     results(i) = clone(x);
   }
   // ensure internal data structures remain valid
-  update_datastructures();
+  update_data();
   return results;
 }
 
@@ -257,6 +262,20 @@ void graph::print_data(){
     Rcout << "Constraint " << i+1 << ": ";
     printVec(zeros[i]);
   }
+
   Rcout << std::endl;
+  Rcout << "Tracking Matrix: " << std::endl;
+
+  for(int i=0; i<nrow;i++){
+    for(int j=0; j<ncol;j++){
+      Rcout << "(" << std::setw(2) << tracking[i][j][0];
+      Rcout << std::setw(1) << "," << std::setw(2);
+      Rcout << std::setw(2) << tracking[i][j][1];
+      Rcout << std::setw(1) << ") ";
+    }
+    Rcout << std::endl;
+  }
+  Rcout << std::endl;
+
   return;
 }
