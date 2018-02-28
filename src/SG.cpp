@@ -1,7 +1,7 @@
 
 /*
 ------------------------------------------------------------
-Implementation of SG algorithm for directed graphs.
+Implementation of SG algorithm.
 ------------------------------------------------------------
 */
 
@@ -36,35 +36,58 @@ void graph::SG_step(){
 
     // initialise
     int i0 = one_dist(generator);
-    Rcout << "i0: " << i0 << std::endl;
     int i0_idx = oneSampler[i0](generator);
-    Rcout << "i0_idx: " << i0_idx << std::endl;
-    int ip = i0, i = ones[i0][i0_idx];
-    Rcout << "i: " << i << std::endl;
-    int idx;
-    int* t;
+    int idx, ip = i0, i = ones[i0][i0_idx];
+    //Rcout << "i0: " << ip << " i: " << i << std::endl;
+    int* t0, *t;
+    if(ip<i) t0 = &tracking[ip][i][1];
+    else t0 = &tracking[i][ip][0];
+    t = t0;
 
-    if(ip<i)
-      t = &tracking[ip][i][1];
-    else
-      t = &tracking[i][ip][0];
+    while(true){
 
-    Rcout << "t: " << t << std::endl;
-    Rcout << "*t: " << *t << std::endl;
+      idx = zeroSampler[i](generator);
+      ip = i;
+      i = zeros[i][idx];
+      //Rcout << "ip: " << ip << " i: " << i << std::endl;
+      //print_data();
+      // swap values
+      std::swap(ones[ip][*t],zeros[ip][idx]);
+      // also swap tracking matrix values
+      if(ip<i){
+        std::swap(*t, tracking[ip][i][0]);
+        t = &tracking[ip][i][1];
+      }
+      else{
+        std::swap(*t, tracking[i][ip][1]);
+        t = &tracking[i][ip][0];
+      }
 
-    idx = zeroSampler[i](generator);
-    Rcout << "idx: " << idx << std::endl;
-    ones[i][*t] = zeros[i][idx];
-    inew = zeros[i][idx];
-    zeros[i][idx] = ip;
-    ip = i;
-    Rcout << "ip: " << ip << std::endl;
-    i = zeros[i][idx];
-    Rcout << "i: " << i << std::endl;
-    if(ip<i)
-      std::swap(*t, tracking[ip][i][1]);
-    else
-      std::swap(*t, tracking[i][ip][0]);
+      if(i == i0) break;
+
+      idx = oneSampler[i](generator);
+      ip = i;
+      i = ones[i][idx];
+      //Rcout << "ip: " << ip << " i: " << i << std::endl;
+      //print_data();
+      // swap values
+      std::swap(zeros[ip][*t],ones[ip][idx]);
+      // also swap tracking matrix values
+      if(ip<i){
+        std::swap(*t, tracking[ip][i][0]);
+        t = &tracking[ip][i][1];
+      }
+      else{
+        std::swap(*t, tracking[i][ip][1]);
+        t = &tracking[i][ip][0];
+      }
+    }
+
+    if(ip != ones[i0][i0_idx]){
+      std::swap(ones[i0][i0_idx], zeros[i0][*t]);
+      std::swap(*t0,*t);
+    }
+
   }
 }
 

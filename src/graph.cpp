@@ -174,14 +174,36 @@ procedure.
 
 // recreates x from data structure
 void graph::update_x(){
-// create matrix by cycling through both rows and cols
-  for(int i=0; i<nrow;i++){
-    for(int j=0; j<zeroNums[i];j++)
-      x(i,zeros[i][j]) = 0;
+
+  if(directed){
+    for(int i=0; i<nrow;i++){
+      for(int j=0; j<zeroNums[i];j++)
+        x(i,zeros[i][j]) = 0;
+    }
+    for(int j= 0; j<ncol;j++){
+      for(int i=0; i<oneNums[j];i++)
+        x(ones[j][i],j) = 1;
+    }
   }
-  for(int j= 0; j<ncol;j++){
-    for(int i=0; i<oneNums[j];i++)
-      x(ones[j][i],j) = 1;
+  else{
+
+    for(int i=0; i<nrow; i++){
+      for(int j=0; j<zeroNums[i];j++){
+        if(zeros[i][j]>i){
+          x(i,zeros[i][j])=0;
+          x(zeros[i][j],i)=0;
+        }
+      }
+    }
+
+    for(int i=0; i<ncol; i++){
+      for(int j=0; j<oneNums[i];j++){
+        if(ones[i][j]>i){
+          x(i,ones[i][j])=1;
+          x(ones[i][j],i)=1;
+        }
+      }
+    }
   }
 }
 
