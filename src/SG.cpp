@@ -40,9 +40,13 @@ void graph::SG_step(){
     int idx, ip = i0, i = ones[i0][i0_idx];
     //Rcout << "i0: " << ip << " i: " << i << std::endl;
     int* t0, *t;
-    if(ip<i) t0 = &tracking[ip][i][1];
-    else t0 = &tracking[i][ip][0];
-    t = t0;
+    if(ip<i){
+      t0 = &tracking[ip][i][0];
+      t = &tracking[ip][i][1];
+    }else{
+      t0 = &tracking[i][ip][1];
+      t = &tracking[i][ip][0];
+    }
 
     while(true){
 
@@ -87,6 +91,8 @@ void graph::SG_step(){
       std::swap(ones[i0][i0_idx], zeros[i0][*t]);
       std::swap(*t0,*t);
     }
+
+    //print_data();
 
   }
 }
