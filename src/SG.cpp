@@ -11,57 +11,39 @@ using namespace Rcpp;
 
 void graph::SG_step(){
 
+  // initialise
+  int io0 = one_dist(generator);
+  int io0_idx = oneSampler[io0](generator);
+  int idx, io = io0, iz = ones[io0][io0_idx];
+
   if(directed){
-    // sample column randomly
-    int j1 = one_dist(generator);
-    int i1_idx = oneSampler[j1](generator);
-    int j = j1, i = ones[j1][i1_idx];
-    int i_ind, j_ind;
 
     while(true){
-      // sample j_k from zeros i_{k-1}
-      j_ind = zeroSampler[i](generator);
-      std::swap(j, zeros[i][j_ind]);
 
-      if(j == j1) break;
+      idx = zeroSampler[iz](generator);
+      std::swap(io, zeros[iz][idx]);
 
-      // sample i_k from ones j_{k}
-      i_ind = oneSampler[j](generator);
-      std::swap(i, ones[j][i_ind]);
+      if(io == io0) break;
+
+      idx = oneSampler[io](generator);
+      std::swap(iz, ones[io][idx]);
     }
-    // need to change ones i1 from j1 to jk
-    ones[j1][i1_idx] = i;
+    ones[io1][io1_idx] = iz;
   }
   else{
 
     int* t0, *t;
 
-    if(ip<i){
-      t0 = &tracking[ip][i][0];
-      t = &tracking[ip][i][1];
+    if(io<iz){
+      t0 = &tracking[io][iz][0];
+      t = &tracking[io][iz][1];
     }
     else{
-      t0 = &tracking[i][ip][1];
-      t = &tracking[i][ip][0];
+      t0 = &tracking[iz][io][1];
+      t = &tracking[iz][io][0];
     }
 
     while(true){
-
-      // initialise
-      int io0 = one_dist(generator);
-      int io0_idx = oneSampler[io0](generator);
-      int idx, io = i0, iz = ones[i0][i0_idx];
-
-      int* t0, *t;
-
-      if(io<iz){
-        t0 = &tracking[io][iz][0];
-        t = &tracking[io][iz][1];
-      }
-      else{
-        t0 = &tracking[iz][io][1];
-        t = &tracking[iz][io][0];
-      }
 
       idx = zeroSampler[iz](generator);
       ones[iz][*t] = zeros[iz][idx];
@@ -88,9 +70,7 @@ void graph::SG_step(){
         std::swap(*t, tracking[iz][io][1]);
         t = &tracking[iz][io][0];
       }
-
     }
-
     if(iz != ones[io0][io0_idx]){
       std::swap(ones[io0][io0_idx], zeros[io0][*t]);
       std::swap(*t0,*t);
