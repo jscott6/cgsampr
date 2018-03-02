@@ -17,8 +17,8 @@ void graph::matching_step(){
     int nFreeStubs = nStubs;
 
     // initialise adjacency matrix to zero matrix
-    for(int i=0; i<nrow; i++){
-      for(int j=0; j<ncol; j++){
+    for(int i=0; i!=nrow; ++i){
+      for(int j=0; j!=ncol; ++j){
         if(fixed(i,j)==0){
           x(i,j)=0;
         }
