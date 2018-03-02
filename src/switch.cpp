@@ -13,6 +13,9 @@ using namespace Rcpp;
 
 void graph::switch_step(){
 
+  if(arcList.size()-1)== 0)
+    return;
+
   if(directed){
 
     int idx1, idx2;
