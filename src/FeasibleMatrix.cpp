@@ -5,8 +5,8 @@ using namespace std;
 using namespace Rcpp;
 
 fm_vertex::fm_vertex():
-  color(white),
   distance(0),
+  color(white),
   predecessor(0){};
 
 // adds an edge to adjacency matrix, while adjusting capacity,

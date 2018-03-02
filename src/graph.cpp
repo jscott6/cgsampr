@@ -20,8 +20,8 @@ void graph::update_data(){
   // initialise the data structures
   zeroNums = std::vector<int>(nrow,0);
   oneNums = std::vector<int>(ncol, 0);
-  ones = std::vector<std::vector<int> > (nrow, std::vector<int>(0));
-  zeros = std::vector<std::vector<int> > (ncol, std::vector<int>(0));
+  ones = std::vector<std::vector<int> > (ncol, std::vector<int>(0));
+  zeros = std::vector<std::vector<int> > (nrow, std::vector<int>(0));
   inStubs = std::vector<int>(0);
   outStubs = std::vector<int>(0);
   arcList = std::vector<arc>(0);
@@ -29,8 +29,8 @@ void graph::update_data(){
 
   // (re)construct them from the current adjacency matrix
   if(directed){
-    for(int i=0;i<nrow;i++){
-      for(int j=0;j<ncol;j++){
+    for(int i=0;i!=nrow;++i){
+      for(int j=0;j!=ncol;++j){
         if(fixed(i,j)==0){
           if(x(i,j)==0){
             zeros[i].push_back(j);
@@ -55,8 +55,8 @@ void graph::update_data(){
     }
   }
   else{
-    for(int k=0; k<nrow; k++){
-      for(int i=0; i<k;i++){
+    for(int k=0; k!=nrow; ++k){
+      for(int i=0; i!=k;++i){
         if(fixed(i,k)==0){
           if(x(i,k)==0){
             zeros[k].push_back(i);
@@ -67,10 +67,15 @@ void graph::update_data(){
             ones[k].push_back(i);
             tracking[i][k][1] = oneNums[k];
             oneNums[k]++;
+            // add arc to arc list
+            arc e;
+            e.tail = i; e.head = k;
+            arcList.push_back(e);
+            nStubs++;
           }
         }
       }
-      for(int j=(k+1);j<nrow;j++){
+      for(int j=(k+1);j!=nrow;++j){
         if(fixed(k,j)==0){
           if(x(k,j)==0){
             zeros[k].push_back(j);
@@ -107,7 +112,7 @@ void graph::init(IntegerMatrix x0, IntegerMatrix f){
 
   update_data();
 
-  for(int j=0; j<ncol; j++){
+  for(int j=0; j!=ncol; ++j){
     std::uniform_int_distribution<int> dist(0, oneNums[j]-1);
     oneSampler.push_back(dist);
     if(oneNums[j] == 0)
@@ -116,7 +121,7 @@ void graph::init(IntegerMatrix x0, IntegerMatrix f){
       weights[j] = 1.0;
   }
 
-  for(int i=0;i<nrow;i++){
+  for(int i=0;i!=nrow;++i){
     std::uniform_int_distribution<int> dist(0,zeroNums[i]-1);
     zeroSampler.push_back(dist);
   }
@@ -176,19 +181,19 @@ procedure.
 void graph::update_x(){
 
   if(directed){
-    for(int i=0; i<nrow;i++){
-      for(int j=0; j<zeroNums[i];j++)
+    for(int i=0; i!=nrow;++i){
+      for(int j=0; j!=zeroNums[i];++j)
         x(i,zeros[i][j]) = 0;
     }
-    for(int j= 0; j<ncol;j++){
-      for(int i=0; i<oneNums[j];i++)
+    for(int j= 0; j!=ncol;++j){
+      for(int i=0; i!=oneNums[j];++i)
         x(ones[j][i],j) = 1;
     }
   }
   else{
 
-    for(int i=0; i<nrow; i++){
-      for(int j=0; j<zeroNums[i];j++){
+    for(int i=0; i!=nrow; ++i){
+      for(int j=0; j!=zeroNums[i];++j){
         if(zeros[i][j]>i){
           x(i,zeros[i][j])=0;
           x(zeros[i][j],i)=0;
@@ -196,8 +201,8 @@ void graph::update_x(){
       }
     }
 
-    for(int i=0; i<ncol; i++){
-      for(int j=0; j<oneNums[i];j++){
+    for(int i=0; i!=ncol; ++i){
+      for(int j=0; j!=oneNums[i];++j){
         if(ones[i][j]>i){
           x(i,ones[i][j])=1;
           x(ones[i][j],i)=1;
@@ -231,8 +236,8 @@ List graph::sample(std::string method, int nsamples=1e4, int thin = 20, int burn
   srand(time(NULL));
   List results(nsamples);
 
-  for(int i=0; i<nsamples;i++){
-    for(int j=0; j<(thin+1);j++)
+  for(int i=0; i!=nsamples;++i){
+    for(int j=0; j!=(thin+1);++j)
       (*this.*func)();
     if(func==&graph::SG_step)
       update_x();
@@ -259,7 +264,7 @@ console for sanity checks
 */
 
 void graph::print_arcList(){
-  for(std::vector<arc>::iterator it = arcList.begin(); it!=arcList.end(); it++)
+  for(std::vector<arc>::iterator it = arcList.begin(); it!=arcList.end(); ++it)
     Rcout << "(" << it->tail +1 << ", " << it->head+1 << ")" << std::endl;
 }
 
@@ -274,13 +279,13 @@ void graph::print_stub_list(){
 
 void graph::print_data(){
   Rcout << "Ones: " << std::endl;
-  for(int i=0; i<ncol;i++){
+  for(int i=0; i!=ncol;++i){
     Rcout << "Constraint " << i+1 << ": ";
     printVec(ones[i]);
   }
   Rcout << std::endl;
   Rcout << "Zeros: " << std::endl;
-  for(int i=0; i<nrow;i++){
+  for(int i=0; i!=nrow;++i){
     Rcout << "Constraint " << i+1 << ": ";
     printVec(zeros[i]);
   }
@@ -288,8 +293,8 @@ void graph::print_data(){
   Rcout << std::endl;
   Rcout << "Tracking Matrix: " << std::endl;
 
-  for(int i=0; i<nrow;i++){
-    for(int j=0; j<ncol;j++){
+  for(int i=0; i!=nrow;++i){
+    for(int j=0; j!=ncol;++j){
       Rcout << "(" << std::setw(2) << tracking[i][j][0];
       Rcout << std::setw(1) << "," << std::setw(2);
       Rcout << std::setw(2) << tracking[i][j][1];

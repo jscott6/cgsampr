@@ -28,7 +28,7 @@ void graph::SG_step(){
       idx = oneSampler[io](generator);
       std::swap(iz, ones[io][idx]);
     }
-    ones[io1][io1_idx] = iz;
+    ones[io0][io0_idx] = iz;
   }
   else{
 
