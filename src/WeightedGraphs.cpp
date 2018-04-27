@@ -6,7 +6,7 @@ using namespace std;
 
 struct vertex{
   vector<*edge> p_in_edges;
-  const vector<*edge> p_poss_out_edges
+  const vector<*edge> p_poss_out_edges;
 };
 
 class edge{
@@ -25,4 +25,17 @@ public: // interface
     p_tail(pt),
     p_weight(pw){}
   void set_weight();
+};
+
+
+class weightedGraph{
+
+private:
+  vector<vertex> vertices;
+  vector<vector<edge> > edges;
+  vector<vector<signed int> > adj_matrix;
+
+public:
+  weightedGraph()
+
 };
