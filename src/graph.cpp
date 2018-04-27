@@ -233,6 +233,8 @@ List graph::sample(std::string method, int nsamples=1e4, int thin = 20, int burn
   else
     throw std::range_error("Method must be either 'SG', 'DG', 'switch' or 'matching' ");
 
+  //rejected = 0;
+
   srand(time(NULL));
   List results(nsamples);
 
@@ -245,6 +247,8 @@ List graph::sample(std::string method, int nsamples=1e4, int thin = 20, int burn
   }
   // ensure internal data structures remain valid
   update_data();
+
+  //Rcout << "Rejected: " << float (rejected)/ float ((nsamples*(thin+1))) << std::endl;
   return results;
 }
 

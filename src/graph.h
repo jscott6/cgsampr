@@ -33,6 +33,7 @@ private:
   std::vector<std::vector<std::vector<int> > > tracking;
   std::default_random_engine generator;
   int nrow, ncol, nStubs;
+  signed int rejected;
   Rcpp::IntegerMatrix x;
   Rcpp::IntegerMatrix fixed;
 
@@ -41,7 +42,7 @@ public:
   graph(Rcpp::IntegerVector r, Rcpp::IntegerVector c, Rcpp::IntegerMatrix f, bool digraph = FALSE);
   Rcpp::IntegerMatrix get_x();
   Rcpp::IntegerMatrix get_fixed();
-  Rcpp::List sample(std::string method, int, int, int);
+  Rcpp::List sample(std::string method, int nsamples, int thin, int burnin);
   void print_data();
   void print_arcList();
   void print_stub_list();

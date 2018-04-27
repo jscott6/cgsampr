@@ -13,8 +13,8 @@ using namespace Rcpp;
 
 void graph::switch_step(){
 
-  if(arcList.size()-1)== 0)
-    return;
+  if(arcList.size()-1== 0)
+    throw std::range_error("Only one arc/edge, not possible to sample");
 
   if(directed){
 
@@ -35,12 +35,16 @@ void graph::switch_step(){
 
 
     // no edges can already exist between heads and tails of different edges
-    if(x(tail2, head1) == 1 || x(tail1,head2) == 1)
+    if(x(tail2, head1) == 1 || x(tail1,head2) == 1){
+      rejected++;
       return;
+    }
 
     // potential edges cannot be fixed...
-    if(fixed(tail2, head1)==1 || fixed(tail1,head2)==1)
+    if(fixed(tail2, head1)==1 || fixed(tail1,head2)==1){
+      rejected++;
       return;
+    }
 
     // update edges
     arcList[idx1].head = head2;
@@ -71,12 +75,16 @@ void graph::switch_step(){
     int v = arcList[idx2].tail;
 
     // if proposed edges are prohibited, return
-    if(fixed(y,v)==1 ||fixed(z,u)==1)
+    if(fixed(y,v)==1 ||fixed(z,u)==1){
+      rejected++;
       return;
+    }
 
     // ... or if proposed edges exist, return
-    if(x(y,v)==1 || x(z,u)==1)
+    if(x(y,v)==1 || x(z,u)==1){
+      rejected++;
       return;
+    }
 
     arcList[idx1].tail = v;
     arcList[idx2].head = u;
