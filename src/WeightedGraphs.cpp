@@ -1,41 +1,22 @@
 
-#include <iostream>
-#include <vector>
-using namespace std;
+#include "weightedGraphs.h"
 
 
-struct vertex{
-  vector<*edge> p_in_edges;
-  const vector<*edge> p_poss_out_edges;
-};
+weightedGraph::weightedGraph(Rcpp::IntegerMatrix x0, Rcpp::IntegerMatrix f){
 
-class edge{
+  adj_matrix = clone(x0);
+  int nrow = x0.nrow(), ncol = x0.ncol();
 
-private: // implementation
-  const vertex* p_head, *p_tail;
-  // take weight by reference to avoid reconstructing adj matrix for each sample
-  const unsigned int * p_weight;
-  edge ** p_p_tail_p_in_edges;
-  void add();
-  void remove();
+  // assuming biadjacency matrix
+  vertices = vector<vertex>(nrow + ncol);
+  edges = vector<vector<edge> >(nrow, vector<edge>(ncol));
 
-public: // interface
-  edge(const vertex* ph,const vertex* pt, const unsigned_int* pw):
-    p_head(ph),
-    p_tail(pt),
-    p_weight(pw){}
-  void set_weight();
-};
-
-
-class weightedGraph{
-
-private:
-  vector<vertex> vertices;
-  vector<vector<edge> > edges;
-  vector<vector<signed int> > adj_matrix;
-
-public:
-  weightedGraph()
-
-};
+  // initialise edges
+  for(int i=0;i!=nrow;++i){
+    for(int j=0;j!=ncol;++j){
+      edge e(vertices[nrow+j],vertices[i], adj_matrix[i][j]);
+      edges[i][j] = e;
+    }
+  }
+  return;
+}
