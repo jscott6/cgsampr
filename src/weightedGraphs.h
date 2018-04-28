@@ -14,6 +14,7 @@ using namespace Rcpp;
 class edge;
 
 struct vertex{
+  int index;
   vector<edge*> p_in_edges;
   vector<const edge*> p_poss_out_edges;
 };
@@ -37,6 +38,8 @@ public: // interface
     p_weight(pw){};
   void set_weight();
   int weight(){return *p_weight;};
+  const vertex* tail(){return p_tail;};
+  const vertex* head(){return p_head;};
   const bool is_fixed(){return fixed;};
 };
 
@@ -49,8 +52,7 @@ private:
 
 public:
   weightedGraph(Rcpp::IntegerMatrix x0, Rcpp::IntegerMatrix f);
-  void print_data();
-
+  void printData();
 };
 
 

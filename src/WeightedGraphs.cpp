@@ -18,6 +18,7 @@ weightedGraph::weightedGraph(Rcpp::IntegerMatrix x0, Rcpp::IntegerMatrix f){
       es.push_back(e);
     }
     edges.push_back(es);
+  }
 
   // initialise vertices in left partition (i.e. add possible out edges)
   for(int i=0; i!=nrow; ++i)
@@ -31,19 +32,36 @@ weightedGraph::weightedGraph(Rcpp::IntegerMatrix x0, Rcpp::IntegerMatrix f){
       if(!edges[i][j].is_fixed() && (edges[i][j].weight()>0))
         vertices[nrow+j].p_in_edges.push_back(&edges[i][j]);
 
+  for(int i=0; i!=nrow+ncol;++i)
+    vertices[i].index = i+1;
+
   return;
 }
 
-void weightedGraph::print_data(){
+
+void printVertexData(vertex &v){
+  Rcout << "In Edges" << endl;
+  Rcout << "Tail Head" << endl;
+  for(int i=0; i!=v.p_in_edges.size();++i)
+    Rcout << v.p_in_edges[i]->tail()->index << " " << v.p_in_edges[i]->head()->index << endl;
+  Rcout << endl;
+  return;
+}
+
+
+void weightedGraph::printData(){
 
   int nrow = adj_matrix.nrow(), ncol = adj_matrix.ncol();
   for(int i=0;i!=nrow;++i){
-    for(int j=0;j!=ncol;++j){
+    for(int j=0;j!=ncol;++j)
       Rcout << edges[i][j].weight() << " ";
-    }
     Rcout << endl;
   }
   Rcout << endl;
-  return;
 
+  for(int i=0;i!=vertices.size();++i){
+    Rcout << "Vertex " << i << endl;
+    printVertexData(vertices[i]);
+  }
+  return;
 }

@@ -19,6 +19,6 @@ RCPP_MODULE(weightedGraph){
   class_<weightedGraph>("weightedGraph")
 
   .constructor<IntegerMatrix,IntegerMatrix>()
-  .method("print_data", &weightedGraph::print_data, "Prints internal data structure to R console")
+  .method("printData", &weightedGraph::printData, "Prints internal data structure to R console")
   ;
 }
