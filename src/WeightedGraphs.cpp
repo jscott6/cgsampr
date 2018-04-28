@@ -40,10 +40,29 @@ weightedGraph::weightedGraph(Rcpp::IntegerMatrix x0, Rcpp::IntegerMatrix f){
 
 
 void printVertexData(vertex &v){
+
   Rcout << "In Edges" << endl;
-  Rcout << "Tail Head" << endl;
-  for(int i=0; i!=v.p_in_edges.size();++i)
-    Rcout << v.p_in_edges[i]->tail()->index << " " << v.p_in_edges[i]->head()->index << endl;
+  Rcout << "Tail: ";
+  for(int i=0; i!=v.p_in_edges.size();++i){
+    Rcout << setw(2) << v.p_in_edges[i]->tail()->index << " ";
+  }
+  Rcout << endl;
+  Rcout << "Head: ";
+  for(int i=0; i!=v.p_in_edges.size();++i){
+    Rcout << setw(2) << v.p_in_edges[i]->head()->index << " ";
+  }
+  Rcout << endl;
+
+  Rcout << "Possible Out Edges" << endl;
+  Rcout << "Tail: ";
+  for(int i=0; i!=v.p_poss_out_edges.size();++i){
+    Rcout << setw(2) << v.p_poss_out_edges[i]->tail()->index << " ";
+  }
+  Rcout << endl;
+  Rcout << "Head: ";
+  for(int i=0; i!=v.p_poss_out_edges.size();++i){
+      Rcout << setw(2) << v.p_poss_out_edges[i]->head()->index << " ";
+  }
   Rcout << endl;
   return;
 }
@@ -59,9 +78,10 @@ void weightedGraph::printData(){
   }
   Rcout << endl;
 
-  for(int i=0;i!=vertices.size();++i){
-    Rcout << "Vertex " << i << endl;
+  for(int i=0; i!=vertices.size(); ++i){
+    Rcout << "Vertex " << vertices[i].index << endl;
     printVertexData(vertices[i]);
+    Rcout << endl;
   }
   return;
 }

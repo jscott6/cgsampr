@@ -6,6 +6,7 @@
 #include <Rcpp.h>
 #include <vector>
 #include <algorithm>
+#include <iomanip>
 
 using namespace std;
 using namespace Rcpp;
@@ -16,7 +17,7 @@ class edge;
 struct vertex{
   int index;
   vector<edge*> p_in_edges;
-  vector<const edge*> p_poss_out_edges;
+  vector<edge*> p_poss_out_edges;
 };
 
 class edge{
