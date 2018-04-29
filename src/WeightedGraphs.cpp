@@ -45,38 +45,12 @@ weightedGraph::weightedGraph(Rcpp::IntegerMatrix x0, Rcpp::IntegerMatrix f){
 
 void weightedGraph::sampleStep(){
 
-  uniform_int_distribution<int> dist(0,init_vertices.size()-1);
-  vertex* u0 = init_vertices[dist(generator)];
-  uniform_int_distribution<int> dist1(0,u0->p_in_edges.size()-1);
-  edge* e = u0->p_in_edges[dist1(generator)];
+  vertex* u0 = sampleFromVector(init_vertices);
+  edge* e = sampleFromVector(u0->p_in_edges);
   Rcout << e->tail()->index + 1 << "->" << e->head()->index + 1 << endl;
   return;
 }
 
-/*
-generic function to sample from a vector
-given some vector, return a random (uniform) element from it
-Assumes vector is non-empty
-*/
-template class<T>
-T sampleFromVector(vector<T> vec, default_random_engine gen){
-  uniform_int_distribution<int> dist(0, vec.size()-1);
-  return vec[dist(gen)];
-}
-
-/*
-generic function to sample NEW element from a vector
-given some vector, return a new random (uniform) element from it
-Assumes vector is of size 2 or more
-*/
-template class<T>
-T sampleNewFromVector(vector<T> vec, T x, default_random_engine gen){
-  uniform_int_distribution<int> dist(0, vec.size()-2);
-  T res = vec[dist(gen)];
-  if(res==x)
-    res = vec.back();
-  return res;
-}
 
 /*
 

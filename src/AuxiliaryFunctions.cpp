@@ -80,3 +80,29 @@ void printVertexData(vertex &v){
   Rcout << endl;
   return;
 }
+
+
+/*
+generic function to sample from a vector
+given some vector, return a random (uniform) element from it
+Assumes vector is non-empty
+*/
+template class<T>
+T sampleFromVector(vector<T> &vec, default_random_engine gen){
+  uniform_int_distribution<int> dist(0, vec.size()-1);
+  return vec[dist(gen)];
+}
+
+/*
+generic function to sample NEW element from a vector
+given some vector, return a new random (uniform) element from it
+Assumes vector is of size 2 or more
+*/
+template class<T>
+T sampleNewFromVector(vector<T> &vec, T x, default_random_engine gen){
+  uniform_int_distribution<int> dist(0, vec.size()-2);
+  T res = vec[dist(gen)];
+  if(res==x)
+    res = vec.back();
+  return res;
+}
