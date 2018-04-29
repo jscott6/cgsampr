@@ -20,5 +20,6 @@ RCPP_MODULE(weightedGraph){
 
   .constructor<IntegerMatrix,IntegerMatrix>()
   .method("printData", &weightedGraph::printData, "Prints internal data structure to R console")
+  .method("sampleStep", &weightedGraph::sampleStep, "Performs a single sampling step")
   ;
 }

@@ -1,5 +1,6 @@
 
 #include "weightedGraphs.h"
+#include "AuxiliaryFunctions.h"
 
 
 weightedGraph::weightedGraph(Rcpp::IntegerMatrix x0, Rcpp::IntegerMatrix f){
@@ -32,41 +33,72 @@ weightedGraph::weightedGraph(Rcpp::IntegerMatrix x0, Rcpp::IntegerMatrix f){
       if(!edges[i][j].is_fixed() && (edges[i][j].weight()>0))
         vertices[nrow+j].p_in_edges.push_back(&edges[i][j]);
 
-  for(int i=0; i!=nrow+ncol;++i)
-    vertices[i].index = i+1;
+  for(int i=0; i!=nrow+ncol;++i){
+    vertices[i].index = i;
+    if(vertices[i].p_in_edges.size()!=0)
+      init_vertices.push_back(&vertices[i]);
+  }
 
   return;
 }
 
 
-void printVertexData(vertex &v){
+void weightedGraph::sampleStep(){
 
-  Rcout << "In Edges" << endl;
-  Rcout << "Tail: ";
-  for(int i=0; i!=v.p_in_edges.size();++i){
-    Rcout << setw(2) << v.p_in_edges[i]->tail()->index << " ";
-  }
-  Rcout << endl;
-  Rcout << "Head: ";
-  for(int i=0; i!=v.p_in_edges.size();++i){
-    Rcout << setw(2) << v.p_in_edges[i]->head()->index << " ";
-  }
-  Rcout << endl;
-
-  Rcout << "Possible Out Edges" << endl;
-  Rcout << "Tail: ";
-  for(int i=0; i!=v.p_poss_out_edges.size();++i){
-    Rcout << setw(2) << v.p_poss_out_edges[i]->tail()->index << " ";
-  }
-  Rcout << endl;
-  Rcout << "Head: ";
-  for(int i=0; i!=v.p_poss_out_edges.size();++i){
-      Rcout << setw(2) << v.p_poss_out_edges[i]->head()->index << " ";
-  }
-  Rcout << endl;
+  uniform_int_distribution<int> dist(0,init_vertices.size()-1);
+  vertex* u0 = init_vertices[dist(generator)];
+  uniform_int_distribution<int> dist1(0,u0->p_in_edges.size()-1);
+  edge* e = u0->p_in_edges[dist1(generator)];
+  Rcout << e->tail()->index + 1 << "->" << e->head()->index + 1 << endl;
   return;
 }
 
+/*
+generic function to sample from a vector
+given some vector, return a random (uniform) element from it
+Assumes vector is non-empty
+*/
+template class<T>
+T sampleFromVector(vector<T> vec, default_random_engine gen){
+  uniform_int_distribution<int> dist(0, vec.size()-1);
+  return vec[dist(gen)];
+}
+
+/*
+generic function to sample NEW element from a vector
+given some vector, return a new random (uniform) element from it
+Assumes vector is of size 2 or more
+*/
+template class<T>
+T sampleNewFromVector(vector<T> vec, T x, default_random_engine gen){
+  uniform_int_distribution<int> dist(0, vec.size()-2);
+  T res = vec[dist(gen)];
+  if(res==x)
+    res = vec.back();
+  return res;
+}
+
+/*
+
+// adds edge to in 'in edges' of head vertex
+// assumes edge is NOT already referenced in vertex data
+// will only be called as part of set_weight
+void edge::add(){
+  p_head->p_in_edges.push_back(this);
+  p_p_head_p_in_edges = p_head->p_in_edges->back();
+}
+
+// removes edge from 'in edges' of a vertex
+// assumes edge is referenced in vertex at location p_p_head_p_in_edges
+// will only be called as part of set_weight
+void edge::remove(){
+    p_head->p_in_edges->back()->p_p_head_p_in_edges = p_p_head_p_in_edges;
+    swap(p_p_head_p_in_edges, p_head->p_in_edges->back());
+    p_head->p_in_edges.pop_back();
+}
+
+
+*/
 
 void weightedGraph::printData(){
 
@@ -79,7 +111,10 @@ void weightedGraph::printData(){
   Rcout << endl;
 
   for(int i=0; i!=vertices.size(); ++i){
-    Rcout << "Vertex " << vertices[i].index << endl;
+    Rcout << "------------------------" << endl;
+    Rcout << "VERTEX " << vertices[i].index+1 << endl;
+    Rcout << "------------------------" << endl;
+    Rcout << endl;
     printVertexData(vertices[i]);
     Rcout << endl;
   }

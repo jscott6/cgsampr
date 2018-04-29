@@ -6,7 +6,7 @@
 #include <Rcpp.h>
 #include <vector>
 #include <algorithm>
-#include <iomanip>
+#include <random>
 
 using namespace std;
 using namespace Rcpp;
@@ -26,7 +26,7 @@ private: // implementation
   const bool fixed;
   // take weight by reference to avoid reconstructing adj matrix for each sample
   const int * p_weight;
-  edge ** p_p_tail_p_in_edges;
+  edge ** p_p_head_p_in_edges;
 
   void add();
   void remove();
@@ -49,11 +49,15 @@ class weightedGraph{
 private:
   vector<vertex> vertices;
   vector<vector<edge> > edges;
+  vector<vertex*> init_vertices;
   Rcpp::IntegerMatrix adj_matrix;
+  default_random_engine generator;
+
 
 public:
   weightedGraph(Rcpp::IntegerMatrix x0, Rcpp::IntegerMatrix f);
   void printData();
+  void sampleStep();
 };
 
 
