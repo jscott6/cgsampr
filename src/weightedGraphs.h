@@ -3,61 +3,77 @@
 #ifndef GUARD_weightedGraph
 #define GUARD_weightedGraph
 
+#define STAR INT_MAX
+
 #include <Rcpp.h>
 #include <vector>
 #include <algorithm>
 #include <random>
 
-using namespace std;
-using namespace Rcpp;
-
-
 class edge;
 
 struct vertex{
   int index;
-  vector<edge*> p_in_edges;
-  vector<edge*> p_poss_out_edges;
+  std::vector<edge*> p_in_edges;
+  std::vector<edge*> p_poss_out_edges;
 };
+
+struct deltaRange{
+  int low, up;
+  deltaRange(): low(INT_MIN), up(INT_MAX){};
+};
+
 
 class edge{
 private: // implementation
-  const vertex* p_head, *p_tail;
-  const bool fixed;
+  vertex* const p_head, *p_tail;
+  bool const fixed;
   // take weight by reference to avoid reconstructing adj matrix for each sample
-  const int * p_weight;
-  edge ** p_p_head_p_in_edges;
+  int * const p_weight;
+  int  pos;
+  int m_visits;
 
   void add();
   void remove();
 
 public: // interface
-  edge(const vertex* ph,const vertex* pt, const int* pw, const bool f):
+  edge(vertex* const ph,vertex* const pt, int* const pw, const bool f):
     p_head(ph),
     p_tail(pt),
     fixed(f),
-    p_weight(pw){};
-  void set_weight();
+    p_weight(pw),
+    pos(-1),
+    m_visits(STAR){};
+  void set_weight(int);
+  void set_pos(int pp){pos=pp;};
   int weight(){return *p_weight;};
+  int visits(){return m_visits;};
+  void increment();
+  void decrement();
+  void reset();
   const vertex* tail(){return p_tail;};
   const vertex* head(){return p_head;};
   const bool is_fixed(){return fixed;};
+  int get_pos(){return pos;};
 };
+
+
 
 class weightedGraph{
 
 private:
-  vector<vertex> vertices;
-  vector<vector<edge> > edges;
-  vector<vertex*> init_vertices;
+  std::vector<vertex> vertices;
+  std::vector<std::vector<edge> > edges;
+  std::vector<vertex*> init_vertices;
   Rcpp::IntegerMatrix adj_matrix;
-  default_random_engine generator;
+  std::default_random_engine generator;
 
 
 public:
   weightedGraph(Rcpp::IntegerMatrix x0, Rcpp::IntegerMatrix f);
   void printData();
   void sampleStep();
+  Rcpp::IntegerMatrix get_adj_matrix(){return adj_matrix;};
 };
 
 

@@ -21,5 +21,6 @@ RCPP_MODULE(weightedGraph){
   .constructor<IntegerMatrix,IntegerMatrix>()
   .method("printData", &weightedGraph::printData, "Prints internal data structure to R console")
   .method("sampleStep", &weightedGraph::sampleStep, "Performs a single sampling step")
+  .property("adj_matrix", &weightedGraph::get_adj_matrix, "Returns graph biadjacency matrix")
   ;
 }
