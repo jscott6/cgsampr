@@ -131,10 +131,6 @@ void weightedGraph::sampleStep(){
   return;
 }
 
-
-
-
-
 void edge::increment(){
   if(m_visits==STAR) m_visits = 1;
   else m_visits++;
@@ -174,8 +170,6 @@ void edge::set_weight(int w){
   if(*p_weight>0 && w==0) remove();
   *p_weight = w;
 }
-
-
 
 
 void weightedGraph::printData(){

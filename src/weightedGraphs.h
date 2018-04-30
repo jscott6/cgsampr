@@ -67,6 +67,9 @@ private:
   std::vector<vertex*> init_vertices;
   Rcpp::IntegerMatrix adj_matrix;
   std::default_random_engine generator;
+  void sampleKernel(std::vector<edge*> & vec);
+  deltaRange getDeltaRange(std::vector<edge*> & vec);
+  void updateWeights(std::vector<edge*>& vec, int delta);
 
 
 public:

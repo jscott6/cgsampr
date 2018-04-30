@@ -44,7 +44,7 @@ void printMatrix(IntegerMatrix vec){
 void printVertexData(vertex &v){
 
   Rcout << "------------------------" << endl;
-  Rcout << "VERTEX " << vertices[i].index+1 << endl;
+  Rcout << "VERTEX " << v.index+1 << endl;
   Rcout << "------------------------" << endl;
   Rcout << endl;
 
