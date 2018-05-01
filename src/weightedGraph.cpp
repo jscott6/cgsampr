@@ -95,8 +95,24 @@ weightedGraph::weightedGraph(Rcpp::IntegerMatrix x0, Rcpp::IntegerMatrix f){
       init_vertices.push_back(&vertices[i]);
   }
 
+  if(init_vertices.size()==0)
+    throw invalid_argument("Graph fully determined by specification");
+
   return;
 }
+
+edge::edge(vertex* const ph,vertex* const pt, int* const pw, const bool f):
+  p_head(ph),
+  p_tail(pt),
+  fixed(f),
+  p_weight(pw),
+  pos(-1),
+  m_visits(STAR)
+{
+  if(*p_weight>0 && !f) add();
+  return;
+}
+
 
 
 void weightedGraph::sampleKernel(vector<edge*> & vec){
@@ -164,10 +180,6 @@ void edge::decrement(){
   return;
 }
 
-void edge::reset(){
-  m_visits = STAR;
-  return;
-}
 
 // adds edge to in 'in edges' of head vertex
 // assumes edge is NOT already referenced in vertex data

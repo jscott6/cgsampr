@@ -38,24 +38,18 @@ private: // implementation
   void remove();
 
 public: // interface
-  edge(vertex* const ph,vertex* const pt, int* const pw, const bool f):
-    p_head(ph),
-    p_tail(pt),
-    fixed(f),
-    p_weight(pw),
-    pos(-1),
-    m_visits(STAR){};
+  edge(vertex* const ph,vertex* const pt, int* const pw, const bool f);
   void set_weight(int);
   void set_pos(int pp){pos=pp;};
-  int weight(){return *p_weight;};
-  int visits(){return m_visits;};
   void increment();
   void decrement();
-  void reset();
+  void reset(){m_visits = STAR;};
   const vertex* tail(){return p_tail;};
   const vertex* head(){return p_head;};
   const bool is_fixed(){return fixed;};
   int get_pos(){return pos;};
+  int weight(){return *p_weight;};
+  int visits(){return m_visits;};
 };
 
 
@@ -78,6 +72,7 @@ public:
   void printData();
   void sampleStep();
   Rcpp::IntegerMatrix get_adj_matrix(){return adj_matrix;};
+  std::vector<edge>* get_edges(){return &edges[0];};
 };
 
 
