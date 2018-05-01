@@ -8,7 +8,7 @@ Exposes weightedGraph class to R via Rcpp Modules
 
 
 
-#include "weightedGraphs.h"
+#include "weightedGraph.h"
 
 // [[Rcpp::plugins(cpp11)]]
 

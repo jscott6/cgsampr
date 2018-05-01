@@ -5,7 +5,7 @@
 #include <Rcpp.h>
 #include <vector>
 #include <iomanip>
-#include "weightedGraphs.h"
+#include "weightedGraph.h"
 
 
 void printVec(std::vector<int> );

@@ -1,5 +1,5 @@
 
-#include "weightedGraphs.h"
+#include "weightedGraph.h"
 #include "AuxiliaryFunctions.h"
 
 using namespace std;
@@ -37,6 +37,25 @@ int sampleDelta(const deltaRange& dr, default_random_engine& generator){
 }
 
 weightedGraph::weightedGraph(Rcpp::IntegerMatrix x0, Rcpp::IntegerMatrix f){
+
+  // validate matrices
+  if(x0.nrow()!=f.nrow() || x0.ncol()!=f.ncol())
+    throw invalid_argument("Dimension of x and f do not match");
+
+  bool validx = true;
+  bool validf = true;
+
+  for(int i=0;i!=x0.nrow();++i){
+    for(int j=0;j!=x0.ncol();++j){
+      if(x0(i,j)<0) validx = false;
+      if(f(i,j)!=0 && f(i,j)!=1) validf = false;
+    }
+  }
+
+  if(!validx)
+    throw invalid_argument("All entries of x must be greater than or equal to zero");
+  else if(!validf)
+    throw invalid_argument("All entries of f must be binary valued");
 
   adj_matrix = clone(x0);
   int nrow = x0.nrow(), ncol = x0.ncol();
