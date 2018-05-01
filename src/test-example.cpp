@@ -33,7 +33,7 @@ context("Sample unit tests") {
   // unit test, and use 'expect_true()' and 'expect_false()'
   // to test the desired conditions.
   test_that("two plus two equals four") {
-    expect_true(twoPlusTwo() == 4);
+    expect_true(twoPlusTwo() == 5);
   }
 
   test_that("two plus three equals five"){

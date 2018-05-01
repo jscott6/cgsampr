@@ -104,6 +104,7 @@ void weightedGraph::sampleKernel(vector<edge*> & vec){
     return;
 }
 
+
 deltaRange weightedGraph::getDeltaRange(vector<edge*> & vec){
   // compute support for Delta
   deltaRange dr;
@@ -113,6 +114,7 @@ deltaRange weightedGraph::getDeltaRange(vector<edge*> & vec){
   }
   return dr;
 }
+
 
 void weightedGraph::updateWeights(vector<edge*>& vec, int delta){
   for(auto &e: vec){

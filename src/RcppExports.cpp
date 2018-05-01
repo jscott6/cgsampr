@@ -5,11 +5,22 @@
 
 using namespace Rcpp;
 
+// run_testthat_tests
+extern "C" SEXP run_testthat_tests();
+RcppExport SEXP _graphs_run_testthat_tests() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(run_testthat_tests());
+    return rcpp_result_gen;
+END_RCPP
+}
 
 RcppExport SEXP _rcpp_module_boot_graph();
 RcppExport SEXP _rcpp_module_boot_weightedGraph();
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_graphs_run_testthat_tests", (DL_FUNC) &_graphs_run_testthat_tests, 0},
     {"_rcpp_module_boot_graph", (DL_FUNC) &_rcpp_module_boot_graph, 0},
     {"_rcpp_module_boot_weightedGraph", (DL_FUNC) &_rcpp_module_boot_weightedGraph, 0},
     {NULL, NULL, 0}

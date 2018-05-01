@@ -62,7 +62,7 @@ inline int rand() { return 42; }
 inline void exit(int) throw() {}
 
 }
-# include "vendor/catch.h"
+# include "testthat/vendor/catch.h"
 
 // Implement an output stream that avoids writing to stdout / stderr.
 extern "C" void Rprintf(const char*, ...);
