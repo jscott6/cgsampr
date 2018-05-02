@@ -94,7 +94,8 @@ edge::edge(vertex* const ph,vertex* const pt, int* const pw, const bool f):
   pos(-1),
   m_visits(STAR)
 {
-  if(*p_weight>0 && !f) add();
+  if(*p_weight>0 && !fixed) add();
+  if(!fixed) p_tail->p_poss_out_edges.push_back(this);
   return;
 }
 

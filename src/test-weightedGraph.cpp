@@ -27,12 +27,13 @@ context("WeightedGraph") {
 
   test_that("Initialiser initialises edge pos member correctly "){
     IntegerMatrix x(5,5), f(5,5);
+    int nrow = x.nrow(), ncol = x.ncol();
     fill(x.begin(), x.end(), 10);
     weightedGraph wg(x,f);
-    vector<edge>* edges = wg.get_edges();
+    edge** edges = wg.get_edges();
     bool res = true;
-    for(int i=0; i!=edges->size(); ++i){
-      for(int j=0; j!=edges[0].size();++j){
+    for(int i=0; i!=nrow; ++i){
+      for(int j=0; j!=ncol;++j){
         edge * e = &edges[i][j];
         edge * p = e->head()->p_in_edges[e->get_pos()];
         if(p!=e)
@@ -47,7 +48,7 @@ context("WeightedGraph") {
     fill(x.begin(), x.end(), 10);
     f(2,3) = 1;
     weightedGraph wg(x, f);
-    vector<edge>* edges = wg.get_edges();
+    edge** edges = wg.get_edges();
     expect_true(edges[2][3].get_pos() == -1);
   }
 
