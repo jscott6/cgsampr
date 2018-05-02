@@ -1,5 +1,6 @@
 #include <testthat.h>
 #include <Rcpp.h>
+#include <stdexcept>
 #include "weighted_graph.h"
 using namespace std;
 using namespace Rcpp;

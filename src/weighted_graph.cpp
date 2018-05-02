@@ -1,7 +1,6 @@
 
 #include "weighted_graph.h"
 #include "AuxiliaryFunctions.h"
-
 using namespace std;
 using namespace Rcpp;
 
@@ -30,7 +29,6 @@ T sampleNewFromVector(const vector<T>& vec, T x, default_random_engine& gen) {
     res = vec.back();
   return res;
 }
-
 
 int sampleDelta(const DeltaRange& dr, default_random_engine& gen) {
   uniform_int_distribution<int> dist(dr.low, dr.up);
@@ -80,20 +78,6 @@ WeightedGraph::WeightedGraph(Rcpp::IntegerMatrix x, Rcpp::IntegerMatrix f) {
   return;
 }
 
-Edge::Edge(Vertex* const h,Vertex* const t, int* const w, const bool f) :
-  head_(h),
-  tail_(t),
-  fixed_(f),
-  weight_(w),
-  pos_(-1),
-  visits_(STAR) {
-  if (*weight_ > 0 && !fixed_) add();
-  if (!fixed_) tail_->out_edges.push_back(this);
-  return;
-}
-
-
-
 void WeightedGraph::sampleKernel(vector<Edge*>& vec) {
     // find a cycle
     Vertex* u0 = sampleFromVector(initial_vertices_, generator_);
@@ -118,7 +102,6 @@ void WeightedGraph::sampleKernel(vector<Edge*>& vec) {
     return;
 }
 
-
 DeltaRange WeightedGraph::getDeltaRange(vector<Edge*> & vec) {
   // compute support for Delta
   DeltaRange dr;
@@ -129,14 +112,12 @@ DeltaRange WeightedGraph::getDeltaRange(vector<Edge*> & vec) {
   return dr;
 }
 
-
 void WeightedGraph::updateWeights(vector<Edge*>& vec, int delta) {
   for (auto& e: vec) {
     e->weight(e->weight() + e->visits()*delta);
     e->reset();
   }
 }
-
 
 void WeightedGraph::sampleStep() {
   vector<Edge*> cycle;
@@ -146,43 +127,6 @@ void WeightedGraph::sampleStep() {
   updateWeights(cycle, delta);
   return;
 }
-
-void Edge::increment() {
-  if (visits_ == STAR) visits_ = 1;
-  else visits_++;
-  return;
-}
-
-void Edge::decrement() {
-  if (visits_ == STAR) visits_ = -1;
-  else visits_--;
-  return;
-}
-
-
-// adds edge to in 'in edges' of head Vertex
-// assumes edge is NOT already referenced in Vertex data
-// will only be called as part of setWeight
-void Edge::add() {
-  pos_ = head_->in_edges.size();
-  head_->in_edges.push_back(this);
-}
-
-// removes edge from 'in edges' of a Vertex
-// assumes edge is referenced in Vertex at location pos
-// will only be called as part of setWeight
-void Edge::remove() {
-    head_->in_edges.back()->pos_ = pos_;
-    swap(head_->in_edges[pos_], head_->in_edges.back());
-    head_->in_edges.pop_back();
-}
-
-void Edge::weight(int w) {
-  if (*weight_ == 0 && w > 0) add();
-  if( *weight_ > 0 && w == 0) remove();
-  *weight_ = w;
-}
-
 
 void WeightedGraph::printData() {
   printMatrix(adjacency_matrix_);
