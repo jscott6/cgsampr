@@ -3,6 +3,7 @@
 #include <testthat.h>
 #include <Rcpp.h>
 #include "weightedGraph.h"
+#include "AuxiliaryFunctions.h"
 
 using namespace std;
 using namespace Rcpp;
@@ -10,15 +11,16 @@ using namespace Rcpp;
 context("WeightedGraph") {
 
   test_that("Initialiser exits gracefully with prohibited input") {
+    int s=5;
     // test wrong dimensions
-    IntegerMatrix x0(5,5), f0(5,6);
+    IntegerMatrix x0(s,s), f0(s,6);
     expect_error_as(weightedGraph(x0,f0), invalid_argument);
     // test x has negative entries
-    IntegerMatrix x1(5,5), f1(5,5);
+    IntegerMatrix x1(s,s), f1(s,s);
     x1(2,3) = -1;
     expect_error_as(weightedGraph(x1,f1), invalid_argument);
     // test f not binary
-    IntegerMatrix x2(5,5), f2(5,5);
+    IntegerMatrix x2(s,s), f2(s,s);
     f2(1,3) = 2;
     expect_error_as(weightedGraph(x2,f2), invalid_argument);
   }
@@ -55,6 +57,26 @@ context("WeightedGraph") {
     expect_error_as(weightedGraph(x,f), invalid_argument);
   }
 
+  test_that("sampleKernel() cycle length"){
+    vector<edge*> cycle;
+    IntegerMatrix x(5,5), f(5,5);
+    fill(x.begin(), x.end(), 10);
+    // length should be four when no elements are fixed
+    weightedGraph wg(x,f);
+    printMatrix(x);
+    printMatrix(f);
+    wg.sampleKernel(cycle);
+    //expect_true(cycle.size()==4);
 
+    vector<edge*> cycle1;
+    IntegerMatrix x1(3,3), f1(3,3);
+    fill(x1.begin(),x1.end(),10);
+    for(int i=0;i!=3;++i)
+      f1(i,i)=1;
+    // length must be 6 in this setup
+    //weightedGraph wg1(x1,f1);
+    //wg.sampleKernel(cycle1);
+    expect_true(cycle1.size()==6);
+  }
 
 }
