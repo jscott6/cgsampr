@@ -1,2 +1,2 @@
 loadModule("graph", TRUE)
-loadModule("weightedGraph", TRUE)
+loadModule("WeightedGraph", TRUE)

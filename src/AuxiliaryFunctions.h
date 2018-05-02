@@ -5,13 +5,12 @@
 #include <Rcpp.h>
 #include <vector>
 #include <iomanip>
-#include "weightedGraph.h"
+#include "weighted_graph.h"
 
-
-void printVec(std::vector<int> );
+void printVec(std::vector<int> vec);
 void printVec(std::vector<unsigned int> vec);
-void printMatrix(Rcpp::IntegerMatrix );
-void printVertexData(vertex &v);
+void printMatrix(Rcpp::IntegerMatrix mat);
+void printVertexData(Vertex &v);
 /*
 template<class T>
 T sampleFromVector(std::vector<T> &vec, std::default_random_engine gen);

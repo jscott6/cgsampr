@@ -1,13 +1,11 @@
-
 #include "AuxiliaryFunctions.h"
-
 using namespace std;
 using namespace Rcpp;
 
 // prints an integer vector to output stream
-void printVec(vector<int> vec){
-  for(vector<int>::const_iterator it=vec.begin();
-      it!=vec.end(); ++it){
+void printVec(vector<int> vec) {
+  for (vector<int>::const_iterator it = vec.begin();
+      it != vec.end(); ++it) {
         Rcout << setprecision(2) << setw(2);
         Rcout << *it << " ";
       }
@@ -15,9 +13,9 @@ void printVec(vector<int> vec){
 }
 
 // prints an integer vector to output stream
-void printVec(vector<unsigned int> vec){
-  for(vector<unsigned int>::const_iterator it=vec.begin();
-      it!=vec.end(); ++it){
+void printVec(vector<unsigned int> vec) {
+  for (vector<unsigned int>::const_iterator it = vec.begin();
+      it != vec.end(); ++it){
         Rcout << setprecision(2) << setw(2);
         Rcout << *it << " ";
       }
@@ -25,12 +23,12 @@ void printVec(vector<unsigned int> vec){
 }
 
 // prints a 2-d array to output stream
-void printMatrix(IntegerMatrix vec){
+void printMatrix(IntegerMatrix vec) {
   int n = vec.nrow();
   Rcout << endl;
-  for(int i=0; i<n; i++){
+  for (int i = 0; i < n; i++) {
     int m = vec.ncol();
-    for(int j=0; j<m; j++){
+    for (int j = 0; j < m; j++){
       Rcout << setprecision(2) << setw(4);
       Rcout << vec(i,j) << " ";
     }
@@ -39,48 +37,41 @@ void printMatrix(IntegerMatrix vec){
   Rcout << endl;
 }
 
-
-
-void printVertexData(vertex &v){
-
+void printVertexData(Vertex& v) {
   Rcout << "------------------------" << endl;
-  Rcout << "VERTEX " << v.index+1 << endl;
+  Rcout << "VERTEX " << v.index + 1 << endl;
   Rcout << "------------------------" << endl;
   Rcout << endl;
-
   Rcout <<  setw(8) << "In Edges" << endl;
   Rcout << "------------" << endl;
   Rcout <<  setw(8) << "Tail: ";
-  for(int i=0; i!=v.p_in_edges.size();++i){
-    Rcout << setw(2) << v.p_in_edges[i]->tail()->index+1 << " ";
-  }
+  for (int i = 0; i != v.in_edges.size(); ++i)
+    Rcout << setw(2) << v.in_edges[i]->tail()->index + 1 << " ";
   Rcout << endl;
   Rcout <<  setw(8) << "Head: ";
-  for(int i=0; i!=v.p_in_edges.size();++i){
-    Rcout << setw(2) << v.p_in_edges[i]->head()->index+1 << " ";
-  }
+  for(int i = 0; i != v.in_edges.size(); ++i)
+    Rcout << setw(2) << v.in_edges[i]->head()->index + 1 << " ";
   Rcout << endl;
   Rcout <<  setw(8) << "Weight: ";
-  for(int i=0; i!=v.p_in_edges.size();++i){
-    Rcout << setw(2) << v.p_in_edges[i]->weight() << " ";
-  }
+  for(int i = 0; i != v.in_edges.size(); ++i)
+    Rcout << setw(2) << v.in_edges[i]->weight() << " ";
   Rcout << endl;
   Rcout << endl;
   Rcout << setw(8) << "Possible Out Edges" << endl;
-    Rcout << "------------" << endl;
+  Rcout << "------------" << endl;
   Rcout <<  setw(8) << "Tail: ";
-  for(int i=0; i!=v.p_poss_out_edges.size();++i){
-    Rcout << setw(2) << v.p_poss_out_edges[i]->tail()->index +1<< " ";
+  for (int i = 0; i != v.out_edges.size(); ++i) {
+    Rcout << setw(2) << v.out_edges[i]->tail()->index + 1<< " ";
   }
   Rcout << endl;
   Rcout <<  setw(8) << "Head: ";
-  for(int i=0; i!=v.p_poss_out_edges.size();++i){
-      Rcout << setw(2) << v.p_poss_out_edges[i]->head()->index +1<< " ";
+  for (int i = 0; i != v.out_edges.size(); ++i) {
+      Rcout << setw(2) << v.out_edges[i]->head()->index + 1<< " ";
   }
   Rcout << endl;
   Rcout <<  setw(8) << "Weight: ";
-  for(int i=0; i!=v.p_poss_out_edges.size();++i){
-    Rcout << setw(2) << v.p_poss_out_edges[i]->weight() << " ";
+  for (int i=0; i != v.out_edges.size(); ++i) {
+    Rcout << setw(2) << v.out_edges[i]->weight() << " ";
   }
   Rcout << endl;
   return;

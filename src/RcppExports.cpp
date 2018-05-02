@@ -17,12 +17,12 @@ END_RCPP
 }
 
 RcppExport SEXP _rcpp_module_boot_graph();
-RcppExport SEXP _rcpp_module_boot_weightedGraph();
+RcppExport SEXP _rcpp_module_boot_WeightedGraph();
 
 static const R_CallMethodDef CallEntries[] = {
     {"_graphs_run_testthat_tests", (DL_FUNC) &_graphs_run_testthat_tests, 0},
     {"_rcpp_module_boot_graph", (DL_FUNC) &_rcpp_module_boot_graph, 0},
-    {"_rcpp_module_boot_weightedGraph", (DL_FUNC) &_rcpp_module_boot_weightedGraph, 0},
+    {"_rcpp_module_boot_WeightedGraph", (DL_FUNC) &_rcpp_module_boot_WeightedGraph, 0},
     {NULL, NULL, 0}
 };
 
