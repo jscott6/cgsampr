@@ -107,24 +107,20 @@ void weightedGraph::sampleKernel(vector<edge*> & vec){
     // find a cycle
     vertex* u0 = sampleFromVector(init_vertices, generator);
     edge* e = sampleFromVector(u0->p_in_edges, generator);
-    Rcout << e->tail()->index << "->" << e->head()->index << endl;
     if(e->visits() == STAR) vec.push_back(e);
     e->increment();
     e = sampleNewFromVector(e->tail()->p_poss_out_edges, e, generator);
-    Rcout << e->tail()->index << "->" << e->head()->index << endl;
     if(e->visits() == STAR) vec.push_back(e);
     e->decrement();
     while(e->head()!=u0){
-      if(e.weight()) e = sampleNewFromVector(e->head()->p_in_edges, e, generator);
+      if(e->weight()) e = sampleNewFromVector(e->head()->p_in_edges, e, generator);
       else e = sampleFromVector(e->head()->p_in_edges, generator);
-    Rcout << e->tail()->index << "->" << e->head()->index << endl;
       if(e->visits() == STAR) vec.push_back(e);
       e->increment();
       if(!edges[e->tail()->index][u0->index - adj_matrix.nrow()].is_fixed())
         e = &edges[e->tail()->index][u0->index - adj_matrix.nrow()];
       else
         e = sampleNewFromVector(e->tail()->p_poss_out_edges, e, generator);
-    Rcout << e->tail()->index << "->" << e->head()->index << endl;
       if(e->visits() == STAR) vec.push_back(e);
       e->decrement();
     }
@@ -136,7 +132,7 @@ deltaRange weightedGraph::getDeltaRange(vector<edge*> & vec){
   // compute support for Delta
   deltaRange dr;
   for(const auto &e: vec){
-    if(e->visits()>0) dr.low = max(dr.low, - e->weight()/e->visits());
+    if(e->visits()>0) dr.low = max(dr.low, -e->weight()/e->visits());
     if(e->visits()<0) dr.up = min(dr.up, -e->weight()/e->visits());
   }
   return dr;

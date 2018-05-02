@@ -58,26 +58,42 @@ context("WeightedGraph") {
     expect_error_as(weightedGraph(x,f), invalid_argument);
   }
 
-  test_that("sampleKernel() cycle length"){
-    vector<edge*> cycle;
-    IntegerMatrix x(5,5), f(5,5);
-    fill(x.begin(), x.end(), 10);
-    // length should be four when no elements are fixed
-    weightedGraph wg(x,f);
-    printMatrix(x);
-    printMatrix(f);
-    wg.sampleKernel(cycle);
-    //expect_true(cycle.size()==4);
+  test_that("sampleKernel() cycle valid"){
 
-    vector<edge*> cycle1;
-    IntegerMatrix x1(3,3), f1(3,3);
+    int nsamples = 1000;
+    IntegerMatrix x(5,5), f(5,5), x1(3,3), f1(3,3);
+    fill(x.begin(), x.end(), 10);
     fill(x1.begin(),x1.end(),10);
-    for(int i=0;i!=3;++i)
-      f1(i,i)=1;
-    // length must be 6 in this setup
-    //weightedGraph wg1(x1,f1);
-    //wg.sampleKernel(cycle1);
-    expect_true(cycle1.size()==6);
+    for(int i=0;i!=3;++i) f1(i,i)=1;
+    weightedGraph wg(x,f);
+    weightedGraph wg1(x1,f1);
+
+    // length should be four when no elements are fixed
+    bool len = true, len_fixed = true, pattern=true, newedge=true;
+    for(int i=0;i!=nsamples;++i){
+      vector<edge*> cycle, cycle1;
+      wg.sampleKernel(cycle);
+      wg.updateWeights(cycle, 0);
+      wg1.sampleKernel(cycle1);
+      wg1.updateWeights(cycle1,0);
+      if(cycle.size()!=4) len = false;
+      if(cycle1.size()!=6) len_fixed = false;
+      for(int k=0; k!=cycle.size(); ++k){
+        if(k%2){
+          if(k!=cycle.size()-1 && cycle[k]->head()!=cycle[k+1]->head()) pattern = false;
+        }
+        else{
+          if(cycle[k]->tail() != cycle[k+1]->tail()) pattern = false;
+        }
+        if(k!=0 && cycle[k]==cycle[k-1]) newedge = false;
+      }
+    }
+
+    expect_true(len);
+    expect_true(len_fixed);
+    expect_true(pattern);
+    expect_true(newedge);
   }
+
 
 }
