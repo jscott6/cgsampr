@@ -20,6 +20,7 @@ T sampleFromVector(const vector<T> &vec, default_random_engine& gen){
 generic function to sample NEW element from a vector
 given some vector, return a new random (uniform) element from it
 Assumes vector is of size 2 or more
+Assumes the element provided is in the vector
 */
 template<class T>
 T sampleNewFromVector(const vector<T> &vec, T x, default_random_engine& gen){
@@ -106,19 +107,24 @@ void weightedGraph::sampleKernel(vector<edge*> & vec){
     // find a cycle
     vertex* u0 = sampleFromVector(init_vertices, generator);
     edge* e = sampleFromVector(u0->p_in_edges, generator);
+    Rcout << e->tail()->index << "->" << e->head()->index << endl;
     if(e->visits() == STAR) vec.push_back(e);
     e->increment();
     e = sampleNewFromVector(e->tail()->p_poss_out_edges, e, generator);
+    Rcout << e->tail()->index << "->" << e->head()->index << endl;
     if(e->visits() == STAR) vec.push_back(e);
     e->decrement();
     while(e->head()!=u0){
-      e = sampleNewFromVector(e->head()->p_in_edges, e, generator);
+      if(e.weight()) e = sampleNewFromVector(e->head()->p_in_edges, e, generator);
+      else e = sampleFromVector(e->head()->p_in_edges, generator);
+    Rcout << e->tail()->index << "->" << e->head()->index << endl;
       if(e->visits() == STAR) vec.push_back(e);
       e->increment();
-      if(!edges[e->tail()->index][u0->index-edges.size()].is_fixed())
-        e = &edges[e->tail()->index][u0->index-edges.size()];
+      if(!edges[e->tail()->index][u0->index - adj_matrix.nrow()].is_fixed())
+        e = &edges[e->tail()->index][u0->index - adj_matrix.nrow()];
       else
         e = sampleNewFromVector(e->tail()->p_poss_out_edges, e, generator);
+    Rcout << e->tail()->index << "->" << e->head()->index << endl;
       if(e->visits() == STAR) vec.push_back(e);
       e->decrement();
     }
