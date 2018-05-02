@@ -58,7 +58,7 @@ class weightedGraph{
 
 private:
   std::vector<vertex> vertices;
-  std::vector<std::vector<edge> > edges;
+  edge** edges;
   std::vector<vertex*> init_vertices;
   Rcpp::IntegerMatrix adj_matrix;
   std::default_random_engine generator;

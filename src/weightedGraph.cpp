@@ -63,31 +63,16 @@ weightedGraph::weightedGraph(Rcpp::IntegerMatrix x0, Rcpp::IntegerMatrix f){
   // assuming biadjacency matrix
   vertices = vector<vertex>(nrow + ncol);
 
+  // allocate memory WITHOUT calling constructor
+  edges = (edge**)malloc(nrow*sizeof(edge));
+  for(int i=0; i!=nrow; ++i) edges[i] = (edge*)malloc(ncol*sizeof(edge));
+
   // initialise edges
-  for(int i=0;i!=nrow;++i){
-    vector<edge> es;
-    for(int j=0;j!=ncol;++j){
-      edge e(&vertices[nrow+j],&vertices[i], &adj_matrix(i,j), f(i,j));
-      es.push_back(e);
-    }
-    edges.push_back(es);
-  }
-
-  // initialise vertices in left partition (i.e. add possible out edges)
-  for(int i=0; i!=nrow; ++i)
-    for(int j=0; j!=ncol; ++j)
-      if(!edges[i][j].is_fixed())
-        vertices[i].p_poss_out_edges.push_back(&edges[i][j]);
-
-  // initialise vertices in right partition (i.e. add all in edges)
-  for(int j=0; j!=ncol; ++j){
-    for(int i=0; i!=nrow; ++i){
-      if(!edges[i][j].is_fixed() && (edges[i][j].weight()>0)){
-        vertices[nrow+j].p_in_edges.push_back(&edges[i][j]);
-        edges[i][j].set_pos(vertices[nrow+j].p_in_edges.size()-1);
-      }
-    }
-  }
+  for(int i=0;i!=nrow;++i)
+    for(int j=0;j!=ncol;++j)
+      // applies constructor directly to final address (avoids copy constructor)
+      // important to keep correct pointers in vertex structures
+      new (&edges[i][j]) edge(&vertices[nrow+j],&vertices[i], &adj_matrix(i,j), f(i,j));
 
   for(int i=0; i!=nrow+ncol;++i){
     vertices[i].index = i;
