@@ -4,8 +4,9 @@
 #include "StronglyConnectedComponents.h"
 #include "FeasibleMatrix.h"
 #include "AuxiliaryFunctions.h"
-
 using namespace Rcpp;
+using namespace UnWeighted;
+using namespace std;
 
 /*
 update_data is used to reconstruct class data from the adjacency
@@ -14,17 +15,16 @@ data, so it is computationally inefficient to track all data during each
 sampling step.
 */
 
-
 void graph::update_data(){
 
   // initialise the data structures
-  zeroNums = std::vector<int>(nrow,0);
-  oneNums = std::vector<int>(ncol, 0);
-  ones = std::vector<std::vector<int> > (ncol, std::vector<int>(0));
-  zeros = std::vector<std::vector<int> > (nrow, std::vector<int>(0));
-  inStubs = std::vector<int>(0);
-  outStubs = std::vector<int>(0);
-  arcList = std::vector<arc>(0);
+  zero_nums = vector<int>(nrow, 0);
+  one_nums = vector<int>(ncol, 0);
+  ones = vector<vector<int> > (ncol, vector<int>(0));
+  zeros = vector<vector<int> > (nrow, vector<int>(0));
+  inStubs = vector<int>(0);
+  outStubs = vector<int>(0);
+  EdgeList = vector<Edge>(0);
   nStubs = 0;
 
   // (re)construct them from the current adjacency matrix
@@ -37,10 +37,10 @@ void graph::update_data(){
             zeroNums[i]++;
           }
           else{
-            // add arc to arc list
-            arc e;
+            // add Edge to Edge list
+            Edge e;
             e.tail = i; e.head = j;
-            arcList.push_back(e);
+            EdgeList.push_back(e);
 
             // add stubs for matching method
             inStubs.push_back(j);
@@ -67,10 +67,10 @@ void graph::update_data(){
             ones[k].push_back(i);
             tracking[i][k][1] = oneNums[k];
             oneNums[k]++;
-            // add arc to arc list
-            arc e;
+            // add Edge to Edge list
+            Edge e;
             e.tail = i; e.head = k;
-            arcList.push_back(e);
+            EdgeList.push_back(e);
             nStubs++;
           }
         }
@@ -101,19 +101,19 @@ void graph::init(IntegerMatrix x0, IntegerMatrix f){
 
   x = clone(x0);
   nrow = x.nrow(); ncol = x.ncol();
-  unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-  generator = std::default_random_engine(seed);
-  tracking = std::vector<std::vector<std::vector<int> > >(nrow, std::vector<std::vector<int> >(ncol,std::vector<int>(2,-1)));
+  unsigned seed = chrono::system_clock::now().time_since_epoch().count();
+  generator = default_random_engine(seed);
+  tracking = vector<vector<vector<int> > >(nrow, vector<vector<int> >(ncol,vector<int>(2,-1)));
   //preprocess f to ensure all neccessarily fixed values have been determined
   scc_graph G(x0,f);
   fixed = G.fixed_values(f);
   fixed = f;
-  std::vector<double> weights(ncol);
+  vector<double> weights(ncol);
 
   update_data();
 
   for(int j=0; j!=ncol; ++j){
-    std::uniform_int_distribution<int> dist(0, oneNums[j]-1);
+    uniform_int_distribution<int> dist(0, oneNums[j]-1);
     oneSampler.push_back(dist);
     if(oneNums[j] == 0)
       weights[j] = 0.0;
@@ -122,11 +122,11 @@ void graph::init(IntegerMatrix x0, IntegerMatrix f){
   }
 
   for(int i=0;i!=nrow;++i){
-    std::uniform_int_distribution<int> dist(0,zeroNums[i]-1);
+    uniform_int_distribution<int> dist(0,zeroNums[i]-1);
     zeroSampler.push_back(dist);
   }
 
-  one_dist = std::discrete_distribution<int> (weights.begin(), weights.end());
+  one_dist = discrete_distribution<int> (weights.begin(), weights.end());
 
 }
 
@@ -219,7 +219,7 @@ Samples and returns adjacency matrices using one of the four procedures:
 */
 
 
-List graph::sample(std::string method, int nsamples=1e4, int thin = 20, int burnin = 1e4){
+List graph::sample(string method, int nsamples=1e4, int thin = 20, int burnin = 1e4){
 
   void (graph::*func)();
   if(method == "SG")
@@ -231,7 +231,7 @@ List graph::sample(std::string method, int nsamples=1e4, int thin = 20, int burn
   else if(method == "matching")
     func = &graph::matching_step;
   else
-    throw std::range_error("Method must be either 'SG', 'DG', 'switch' or 'matching' ");
+    throw range_error("Method must be either 'SG', 'DG', 'switch' or 'matching' ");
 
   //rejected = 0;
 
@@ -248,65 +248,55 @@ List graph::sample(std::string method, int nsamples=1e4, int thin = 20, int burn
   // ensure internal data structures remain valid
   update_data();
 
-  //Rcout << "Rejected: " << float (rejected)/ float ((nsamples*(thin+1))) << std::endl;
+  //Rcout << "Rejected: " << float (rejected)/ float ((nsamples*(thin+1))) << endl;
   return results;
 }
-
-
-/*
-getters to output current adjacency matrix and show fixed entries.
-*/
-
-IntegerMatrix graph::get_x(){ return x;}
-IntegerMatrix graph::get_fixed(){return fixed;};
-
-
 
 /*
 Methods below can be used to print internal class data to the R
 console for sanity checks
 */
 
-void graph::print_arcList(){
-  for(std::vector<arc>::iterator it = arcList.begin(); it!=arcList.end(); ++it)
-    Rcout << "(" << it->tail +1 << ", " << it->head+1 << ")" << std::endl;
+void graph::print_EdgeList(){
+  for(vector<Edge>::iterator it = EdgeList.begin(); it!=EdgeList.end(); ++it)
+    Rcout << "(" << it->tail +1 << ", " << it->head+1 << ")" << endl;
 }
 
 void graph::print_stub_list(){
-  Rcout << "Total Stubs: " << nStubs << std::endl;
-  Rcout << "InStubs: " << std::endl;
+  Rcout << "Total Stubs: " << nStubs << endl;
+  Rcout << "InStubs: " << endl;
   printVec(inStubs);
-  Rcout << std::endl << "OutStubs" << std::endl;
+  Rcout << endl << "OutStubs" << endl;
   printVec(outStubs);
-  Rcout << std::endl;
+  Rcout << endl;
 }
 
 void graph::print_data(){
-  Rcout << "Ones: " << std::endl;
+  Rcout << "Ones: " << endl;
   for(int i=0; i!=ncol;++i){
     Rcout << "Constraint " << i+1 << ": ";
     printVec(ones[i]);
   }
-  Rcout << std::endl;
-  Rcout << "Zeros: " << std::endl;
+  Rcout << endl;
+  Rcout << "Zeros: " << endl;
   for(int i=0; i!=nrow;++i){
     Rcout << "Constraint " << i+1 << ": ";
     printVec(zeros[i]);
   }
 
-  Rcout << std::endl;
-  Rcout << "Tracking Matrix: " << std::endl;
+  Rcout << endl;
+  Rcout << "Tracking Matrix: " << endl;
 
   for(int i=0; i!=nrow;++i){
     for(int j=0; j!=ncol;++j){
-      Rcout << "(" << std::setw(2) << tracking[i][j][0];
-      Rcout << std::setw(1) << "," << std::setw(2);
-      Rcout << std::setw(2) << tracking[i][j][1];
-      Rcout << std::setw(1) << ") ";
+      Rcout << "(" << setw(2) << tracking[i][j][0];
+      Rcout << setw(1) << "," << setw(2);
+      Rcout << setw(2) << tracking[i][j][1];
+      Rcout << setw(1) << ") ";
     }
-    Rcout << std::endl;
+    Rcout << endl;
   }
-  Rcout << std::endl;
+  Rcout << endl;
 
   return;
 }

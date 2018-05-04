@@ -2,6 +2,7 @@
 #include "edge.h"
 #include <algorithm>
 using namespace std;
+using namespace Weighted;
 
 Edge::Edge(Vertex* const h,Vertex* const t, int* const w, const bool f) :
   head_(h),

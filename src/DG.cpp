@@ -31,8 +31,7 @@ void graph::DG_step() {
     x(i2,j1) = 1;
     x(i2,j2) = 0;
   }
-  // pattern 2
-  if (x(i1,j1) == 0 && x(i1,j2) == 1 && x(i2,j1) == 1 && x(i2,j2) == 0){
+  else if (x(i1,j1) == 0 && x(i1,j2) == 1 && x(i2,j1) == 1 && x(i2,j2) == 0){
     x(i1,j1) = 1;
     x(i1,j2) = 0;
     x(i2,j1) = 0;

@@ -1,4 +1,3 @@
-
 #ifndef GUARD_graph
 #define GUARD_graph
 
@@ -9,43 +8,46 @@
 #include <string>
 #include <iomanip>
 
+namespace UnWeighted{
+  struct Edge{
+    int head;
+    int tail;
+  };
+}
 
-struct arc{
-  int head;
-  int tail;
-};
-
-class graph{
-private:
-  void update_x();
-  void init(Rcpp::IntegerMatrix , Rcpp::IntegerMatrix);
-  void switch_step();
-  void DG_step();
-  void SG_step();
-  void matching_step();
-  void update_data();
-  std::vector<int> oneNums, zeroNums, inStubs, outStubs;
-  bool directed;
-  std::vector<arc> arcList;
-  std::vector<std::vector<int> > ones, zeros;
-  std::discrete_distribution<int> one_dist;
-  std::vector<std::uniform_int_distribution<int> > oneSampler, zeroSampler;
-  std::vector<std::vector<std::vector<int> > > tracking;
-  std::default_random_engine generator;
-  int nrow, ncol, nStubs;
-  signed int rejected;
-  Rcpp::IntegerMatrix x;
-  Rcpp::IntegerMatrix fixed;
-
+class Graph {
 public:
-  graph(Rcpp::IntegerMatrix x0, Rcpp::IntegerMatrix f, bool digraph = FALSE);
-  graph(Rcpp::IntegerVector r, Rcpp::IntegerVector c, Rcpp::IntegerMatrix f, bool digraph = FALSE);
-  Rcpp::IntegerMatrix get_x();
-  Rcpp::IntegerMatrix get_fixed();
+  Graph(Rcpp::IntegerMatrix adjacency_matrix, Rcpp::IntegerMatrix fixed,
+     bool digraph = FALSE);
+  Graph(Rcpp::IntegerVector in_degrees, Rcpp::IntegerVector out_degrees,
+     Rcpp::IntegerMatrix f, bool digraph = FALSE);
   Rcpp::List sample(std::string method, int nsamples, int thin, int burnin);
-  void print_data();
-  void print_arcList();
-  void print_stub_list();
+  void printData();
+  void printEdgeList();
+  void printStubList();
+  Rcpp::IntegerMatrix adjacency_matrix() { return adjacency_matrix_; };
+  Rcpp::IntegerMatrix fixed() { return fixed_; };
+
+private:
+  std::vector<int> one_nums_, zero_nums_, in_stubs_, out_stubs_;
+  bool directed_;
+  std::vector<UnWeighted::Edge> edge_list_;
+  std::vector<std::vector<int> > ones_, zeros_;
+  std::discrete_distribution<int> one_dist_;
+  std::vector<std::uniform_int_distribution<int> > one_sampler_, zero_sampler_;
+  std::vector<std::vector<std::vector<int> > > tracking_;
+  std::default_random_engine generator_;
+  int nrow_, ncol_, nstubs_;
+  signed int rejected_;
+  Rcpp::IntegerMatrix adjacency_matrix_;
+  Rcpp::IntegerMatrix fixed_;
+  void updateAdjacencyMatrix();
+  void init(Rcpp::IntegerMatrix adjacency_matrix, Rcpp::IntegerMatrix fixed);
+  void switchStep();
+  void DGStep();
+  void SGStep();
+  void matchingStep();
+  void updateData();
 };
 
 #endif

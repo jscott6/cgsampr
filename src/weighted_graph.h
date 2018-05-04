@@ -13,18 +13,18 @@ struct DeltaRange {
 class WeightedGraph {
 public:
   WeightedGraph(Rcpp::IntegerMatrix x, Rcpp::IntegerMatrix f);
-  void sampleKernel(std::vector<Edge*> & vec);
-  DeltaRange getDeltaRange(std::vector<Edge*> & vec);
-  void updateWeights(std::vector<Edge*>& vec, int delta);
+  void sampleKernel(std::vector<Weighted::Edge*> & vec);
+  DeltaRange getDeltaRange(std::vector<Weighted::Edge*> & vec);
+  void updateWeights(std::vector<Weighted::Edge*>& vec, int delta);
   void printData();
   void sampleStep();
   Rcpp::IntegerMatrix adjacency_matrix() { return adjacency_matrix_; };
-  Edge** edges() { return edges_; };
+  Weighted::Edge** edges() { return edges_; };
 
 private:
-  std::vector<Vertex> vertices_;
-  Edge** edges_;
-  std::vector<Vertex*> initial_vertices_;
+  std::vector<Weighted::Vertex> vertices_;
+  Weighted::Edge** edges_;
+  std::vector<Weighted::Vertex*> initial_vertices_;
   Rcpp::IntegerMatrix adjacency_matrix_;
   std::default_random_engine generator_;
 };
