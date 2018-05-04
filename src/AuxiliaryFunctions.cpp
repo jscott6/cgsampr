@@ -1,26 +1,7 @@
+
 #include "AuxiliaryFunctions.h"
 using namespace std;
 using namespace Rcpp;
-
-// prints an integer vector to output stream
-void printVec(vector<int> vec) {
-  for (vector<int>::const_iterator it = vec.begin();
-      it != vec.end(); ++it) {
-        Rcout << setprecision(2) << setw(2);
-        Rcout << *it << " ";
-      }
-  Rcout << endl;
-}
-
-// prints an integer vector to output stream
-void printVec(vector<unsigned int> vec) {
-  for (vector<unsigned int>::const_iterator it = vec.begin();
-      it != vec.end(); ++it){
-        Rcout << setprecision(2) << setw(2);
-        Rcout << *it << " ";
-      }
-  Rcout << endl;
-}
 
 // prints a 2-d array to output stream
 void printMatrix(IntegerMatrix vec) {

@@ -4,31 +4,6 @@
 using namespace std;
 using namespace Rcpp;
 
-/*
-generic function to sample from a vector
-given some vector, return a random (uniform) element from it
-Assumes vector is non-empty
-*/
-template<class T>
-T sampleFromVector(const vector<T>& vec, default_random_engine& gen) {
-  uniform_int_distribution<int> dist(0, vec.size() - 1);
-  return vec[dist(gen)];
-}
-
-/*
-generic function to sample NEW element from a vector
-given some vector, return a new random (uniform) element from it
-Assumes vector is of size 2 or more
-Assumes the element provided is in the vector
-*/
-template<class T>
-T sampleNewFromVector(const vector<T>& vec, T x, default_random_engine& gen) {
-  uniform_int_distribution<int> dist(0, vec.size() - 2);
-  T res = vec[dist(gen)];
-  if (res == x)
-    res = vec.back();
-  return res;
-}
 
 int sampleDelta(const DeltaRange& dr, default_random_engine& gen) {
   uniform_int_distribution<int> dist(dr.low, dr.up);
