@@ -6,32 +6,32 @@
 #include <vector>
 #include <queue>
 
-#ifndef GUARD_vertexcolor
-#define GUARD_vertexcolor
-enum vertexcolor{white, gray, black};
-#endif
+namespace FeasibleMatrix {
 
-class fm_vertex{
-  friend class fm_graph;
-  unsigned int distance;
-  vertexcolor color;
-  unsigned int predecessor;
+  enum VertexColor{white, gray, black};
 
-public:
-  fm_vertex();
-};
+  struct Vertex {
+    unsigned int distance;
+    VertexColor color;
+    unsigned int predecessor;
+    Vertex() :
+      distance(0),
+      color(white),
+      predecessor(0) {};
+  };
 
-class fm_graph{
-  std::vector<fm_vertex> vertices;
-  std::vector<std::vector<unsigned int> > adj, flow, capacity;
-  unsigned int source, sink;
-public:
-  fm_graph(Rcpp::IntegerVector, Rcpp::IntegerVector);
-  void add_edge(unsigned int, unsigned int, unsigned int);
-  bool find_path();
-  unsigned int calc_path_flow();
-  void update_flow(unsigned int);
-  Rcpp::IntegerMatrix construct_matrix(Rcpp::IntegerVector, Rcpp::IntegerVector);
-};
+  class Graph {
+    std::vector<Vertex> vertices_;
+    std::vector<std::vector<unsigned int> > adjacency_matrix_, flow_, capacity_;
+    unsigned int source_, sink_;
+  public:
+    Graph(Rcpp::IntegerVector, Rcpp::IntegerVector);
+    void addEdge(unsigned int, unsigned int, unsigned int);
+    bool findPath();
+    unsigned int calcPathFlow();
+    void updateFlow(unsigned int);
+    Rcpp::IntegerMatrix constructMatrix(Rcpp::IntegerVector, Rcpp::IntegerVector);
+  };
+}
 
 #endif

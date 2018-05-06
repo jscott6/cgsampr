@@ -1,7 +1,7 @@
 
 /*
 ------------------------------------------------------------
-Exposes graph class to R via Rcpp Modules
+Exposes Graph class to R via Rcpp Modules
 ------------------------------------------------------------
 */
 
@@ -11,20 +11,33 @@ Exposes graph class to R via Rcpp Modules
 
 // [[Rcpp::plugins(cpp11)]]
 
-RCPP_MODULE(graph){
+RCPP_MODULE(Graph_module){
 
   using namespace Rcpp;
+  using namespace UnWeighted;
 
-  class_<graph>("graph")
+  class_<Graph>("Graph")
 
   .constructor<IntegerMatrix,IntegerMatrix,bool>()
   .constructor<IntegerVector,IntegerVector,IntegerMatrix,bool>()
 
-  .method("sample", &graph::sample, "Performs MCMC multiple sampling steps as specified by user, return list of tables")
-  .method("print_data", &graph::print_data, "Prints internal data structure to R console")
-  .method("print_stub_list", &graph::print_stub_list, "Prints the list of in-stubs and out-stubs for the matching method")
-  .method("print_arcList", &graph::print_arcList, "Prints the data of all arcs in the graph")
-  .property("x", &graph::get_x, "Returns current state of table")
-  .property("fixed", &graph::get_fixed, "Returns matrix tracking which table values are fixed")
+  .method("sample",
+          &Graph::sample,
+          "Performs multiple sampling steps as specified by user, return list of tables")
+  .method("printData",
+          &Graph::printData,
+          "Prints internal data structure to R console")
+  .method("printStubList",
+          &Graph::printStubList,
+          "Prints the list of in-stubs and out-stubs for the matching method")
+  .method("printEdgeList",
+          &Graph::printEdgeList,
+          "Prints the data of all arcs in the Graph")
+  .property("x",
+            &Graph::adjacency_matrix,
+            "Returns current state of table")
+  .property("fixed",
+            &Graph::fixed,
+            "Returns matrix tracking_ which table values are fixed_")
   ;
 }

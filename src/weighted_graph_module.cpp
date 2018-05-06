@@ -4,12 +4,13 @@
 
 // [[Rcpp::plugins(cpp11)]]
 
-RCPP_MODULE(WeightedGraph) {
+RCPP_MODULE(WeightedGraph_module) {
   using namespace Rcpp;
-  class_<WeightedGraph>("WeightedGraph")
+  using namespace Weighted;
+  class_<Graph>("WeightedGraph")
   .constructor<IntegerMatrix,IntegerMatrix>()
-  .method("printData", &WeightedGraph::printData, "Prints internal data structure to R console")
-  .method("sampleStep", &WeightedGraph::sampleStep, "Performs a single sampling step")
-  .property("adjacency_matrix", &WeightedGraph::adjacency_matrix, "Returns graph biadjacency matrix")
+  .method("printData", &Graph::printData, "Prints internal data structure to R console")
+  .method("sampleStep", &Graph::sampleStep, "Performs a single sampling step")
+  .property("adjacency_matrix_", &Graph::adjacency_matrix, "Returns Graph biadjacency matrix")
   ;
 }

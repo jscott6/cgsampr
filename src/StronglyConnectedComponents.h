@@ -6,36 +6,40 @@
 #include <Rcpp.h>
 #include <vector>
 
-#ifndef GUARD_vertexcolor
-#define GUARD_vertexcolor
-enum vertexcolor{white, gray, black};
-#endif
+namespace StronglyConnectedComponents {
 
-class scc_vertex{
-  friend class scc_graph;
-  friend bool compare_vertex_ftimes(scc_vertex&, scc_vertex&);
-  unsigned int name;
-  vertexcolor color;
-  unsigned int predecessor;
-  unsigned int discovery;
-  unsigned int finished;
-  unsigned int tree;
-  std::vector<int> neighbours;
-public:
-  scc_vertex(int );
-};
+  enum VertexColor{white, gray, black};
 
-class scc_graph{
-private:
-  unsigned int DFS_Visit(unsigned int, unsigned int, unsigned int);
-  void DFS();
-  void transpose();
-  void strongly_connected_components();
-  // container for the graph vertices
-  std::vector<scc_vertex> vertices;
-public:
-  scc_graph(Rcpp::IntegerMatrix, Rcpp::IntegerMatrix);
-  Rcpp::IntegerMatrix fixed_values(Rcpp::IntegerMatrix);
-};
+  struct Vertex {
+    unsigned int name;
+    VertexColor color;
+    unsigned int predecessor;
+    unsigned int discovery;
+    unsigned int finished;
+    unsigned int tree;
+    std::vector<int> neighbours;
+    Vertex(int i) :
+      name(i),
+      color(white),
+      predecessor(0),
+      discovery(0),
+      finished(0),
+      neighbours(std::vector<int>()) {};
+  };
+
+  class Graph {
+  public:
+    Graph(Rcpp::IntegerMatrix, Rcpp::IntegerMatrix);
+    Rcpp::IntegerMatrix fixed_values(Rcpp::IntegerMatrix);
+  private:
+    unsigned int DFSVisit(unsigned int, unsigned int, unsigned int);
+    void DFS();
+    void transpose();
+    void stronglyConnectedComponents();
+    // container for the graph vertices
+    std::vector<Vertex> vertices;
+  };
+}
+
 
 #endif

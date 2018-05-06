@@ -9,7 +9,7 @@
 #include "edge.h"
 
 void printMatrix(Rcpp::IntegerMatrix mat);
-void printVertexData(Vertex &v);
+void printVertexData(Weighted::Vertex &v);
 
 // prints a vector to output stream (assumes T printable)
 template<class T>

@@ -18,7 +18,7 @@ void printMatrix(IntegerMatrix vec) {
   Rcout << endl;
 }
 
-void printVertexData(Vertex& v) {
+void printVertexData(Weighted::Vertex& v) {
   Rcout << "------------------------" << endl;
   Rcout << "VERTEX " << v.index + 1 << endl;
   Rcout << "------------------------" << endl;

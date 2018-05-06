@@ -2,8 +2,9 @@
 #include "graph.h"
 
 using namespace Rcpp;
+using namespace UnWeighted;
 
-void graph::matching_step(){
+void Graph::matchingStep(){
 
 
   int attempts = 0;
@@ -14,13 +15,13 @@ void graph::matching_step(){
 
     attempts++;
     int discard = 0;
-    int nFreeStubs = nStubs;
+    int nFreeStubs = nstubs_;
 
     // initialise adjacency matrix to zero matrix
-    for(int i=0; i!=nrow; ++i){
-      for(int j=0; j!=ncol; ++j){
-        if(fixed(i,j)==0){
-          x(i,j)=0;
+    for(int i=0; i!=nrow_; ++i){
+      for(int j=0; j!=ncol_; ++j){
+        if(fixed_(i,j)==0){
+          adjacency_matrix_(i,j)=0;
         }
       }
     }
@@ -28,34 +29,34 @@ void graph::matching_step(){
     while(true){
 
       std::uniform_int_distribution<int> dist(0,nFreeStubs-1);
-      int inIdx = dist(generator);
-      int outIdx = dist(generator);
-      int head = inStubs[inIdx];
-      int tail = outStubs[outIdx];
+      int inIdx = dist(generator_);
+      int outIdx = dist(generator_);
+      int head = in_stubs_[inIdx];
+      int tail = out_stubs_[outIdx];
 
       // discard if self-loop or arc exists already
-      if(head==tail || x(tail,head)==1 || fixed(tail,head)==1){
+      if(head==tail || adjacency_matrix_(tail,head)==1 || fixed_(tail,head)==1){
         discard++;
       }
       else{
-        x(tail,head)=1;
+        adjacency_matrix_(tail,head)=1;
         // swap with final entry
         if(inIdx!=(nFreeStubs-1))
-          std::swap(inStubs[inIdx], inStubs[nFreeStubs-1]);
+          std::swap(in_stubs_[inIdx], in_stubs_[nFreeStubs-1]);
         if(outIdx!=(nFreeStubs-1))
-          std::swap(outStubs[outIdx], outStubs[nFreeStubs-1]);
+          std::swap(out_stubs_[outIdx], out_stubs_[nFreeStubs-1]);
         nFreeStubs--;
       }
 
       if(nFreeStubs==0)
         return;
 
-      if(discard > r*nStubs)
+      if(discard > r*nstubs_)
         break;
     }
 
     if(attempts == max_attempts)
-      throw std::string("Could not construct a viable graph");
+      throw std::string("Could not construct a viable Graph");
 
   }
 

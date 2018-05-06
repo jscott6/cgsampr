@@ -5,29 +5,30 @@
 #include "AuxiliaryFunctions.h"
 using namespace std;
 using namespace Rcpp;
+using namespace Weighted;
 
-context("WeightedGraph") {
+context("Graph") {
 
   test_that("Initialiser exits gracefully with prohibited input") {
     int s = 5;
     // test wrong dimensions
     IntegerMatrix x0(s, s), f0(s, 6);
-    expect_error_as(WeightedGraph(x0, f0), invalid_argument);
+    expect_error_as(Graph(x0, f0), invalid_argument);
     // test x has negative entries
     IntegerMatrix x1(s, s), f1(s, s);
     x1(2,3) = -1;
-    expect_error_as(WeightedGraph(x1, f1), invalid_argument);
+    expect_error_as(Graph(x1, f1), invalid_argument);
     // test f not binary
     IntegerMatrix x2(s, s), f2(s, s);
     f2(1,3) = 2;
-    expect_error_as(WeightedGraph(x2, f2), invalid_argument);
+    expect_error_as(Graph(x2, f2), invalid_argument);
   }
 
   test_that("Initialiser initialises Edge pos member correctly ") {
     IntegerMatrix x(5, 5), f(5, 5);
     int nrow = x.nrow(), ncol = x.ncol();
     fill(x.begin(), x.end(), 10);
-    WeightedGraph wg(x, f);
+    Graph wg(x, f);
     Edge** edges = wg.edges();
     bool res = true;
     for (int i = 0; i != nrow; ++i){
@@ -41,11 +42,11 @@ context("WeightedGraph") {
     expect_true(res);
   }
 
-  test_that("Initialiser ignores fixed edges"){
+  test_that("Initialiser ignores fixed_ edges"){
     IntegerMatrix x(5, 5), f(5, 5);
     fill(x.begin(), x.end(), 10);
     f(2, 3) = 1;
-    WeightedGraph wg(x, f);
+    Graph wg(x, f);
     Edge** edges = wg.edges();
     expect_true(edges[2][3].pos() == -1);
   }
@@ -53,7 +54,7 @@ context("WeightedGraph") {
   test_that("Initialiser throws error when matrix determined by specification"){
     IntegerMatrix x(5, 5) , f(5, 5);
     fill(f.begin(), f.end(), 1);
-    expect_error_as(WeightedGraph(x, f), invalid_argument);
+    expect_error_as(Graph(x, f), invalid_argument);
   }
 
   test_that("sampleKernel() cycle valid"){
@@ -62,9 +63,9 @@ context("WeightedGraph") {
     fill(x.begin(), x.end(), 10);
     fill(x1.begin(),x1.end(),10);
     for (int i = 0; i != 3; ++i) f1(i,i)=1;
-    WeightedGraph wg(x, f);
-    WeightedGraph wg1(x1, f1);
-    // length should be four when no elements are fixed
+    Graph wg(x, f);
+    Graph wg1(x1, f1);
+    // length should be four when no elements are fixed_
     bool len = true, len_fixed = true, pattern=true, newedge=true;
     for (int i = 0; i != nsamples; ++i) {
       vector<Edge*> cycle, cycle1;

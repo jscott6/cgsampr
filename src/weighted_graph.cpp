@@ -3,6 +3,7 @@
 #include "AuxiliaryFunctions.h"
 using namespace std;
 using namespace Rcpp;
+using namespace Weighted;
 
 
 int sampleDelta(const DeltaRange& dr, default_random_engine& gen) {
@@ -10,7 +11,7 @@ int sampleDelta(const DeltaRange& dr, default_random_engine& gen) {
   return dist(gen);
 }
 
-WeightedGraph::WeightedGraph(Rcpp::IntegerMatrix x, Rcpp::IntegerMatrix f) {
+Graph::Graph(Rcpp::IntegerMatrix x, Rcpp::IntegerMatrix f) {
   // validate matrices
   if (x.nrow() != f.nrow() || x.ncol() != f.ncol())
     throw invalid_argument("Dimension of x and f do not match");
@@ -53,7 +54,7 @@ WeightedGraph::WeightedGraph(Rcpp::IntegerMatrix x, Rcpp::IntegerMatrix f) {
   return;
 }
 
-void WeightedGraph::sampleKernel(vector<Edge*>& vec) {
+void Graph::sampleKernel(vector<Edge*>& vec) {
     // find a cycle
     Vertex* u0 = sampleFromVector(initial_vertices_, generator_);
     Edge* e = sampleFromVector(u0->in_edges, generator_);
@@ -77,7 +78,7 @@ void WeightedGraph::sampleKernel(vector<Edge*>& vec) {
     return;
 }
 
-DeltaRange WeightedGraph::getDeltaRange(vector<Edge*> & vec) {
+DeltaRange Graph::getDeltaRange(vector<Edge*> & vec) {
   // compute support for Delta
   DeltaRange dr;
   for (const auto& e: vec) {
@@ -87,14 +88,14 @@ DeltaRange WeightedGraph::getDeltaRange(vector<Edge*> & vec) {
   return dr;
 }
 
-void WeightedGraph::updateWeights(vector<Edge*>& vec, int delta) {
+void Graph::updateWeights(vector<Edge*>& vec, int delta) {
   for (auto& e: vec) {
     e->weight(e->weight() + e->visits()*delta);
     e->reset();
   }
 }
 
-void WeightedGraph::sampleStep() {
+void Graph::sampleStep() {
   vector<Edge*> cycle;
   sampleKernel(cycle);
   DeltaRange dr = getDeltaRange(cycle);
@@ -103,7 +104,7 @@ void WeightedGraph::sampleStep() {
   return;
 }
 
-void WeightedGraph::printData() {
+void Graph::printData() {
   printMatrix(adjacency_matrix_);
   for (int i = 0; i != vertices_.size(); ++i){
     printVertexData(vertices_[i]);

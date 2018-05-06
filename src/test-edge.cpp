@@ -4,6 +4,7 @@
 #include "weighted_graph.h"
 using namespace std;
 using namespace Rcpp;
+using namespace Weighted;
 
 context("Edge"){
 

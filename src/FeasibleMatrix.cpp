@@ -3,142 +3,137 @@
 
 using namespace std;
 using namespace Rcpp;
+using namespace FeasibleMatrix;
 
-fm_vertex::fm_vertex():
-  distance(0),
-  color(white),
-  predecessor(0){};
-
-// adds an edge to adjacency matrix, while adjusting capacity,
-void fm_graph::add_edge(unsigned int i, unsigned int j, unsigned int cap){
-  adj[i].push_back(j);
-  capacity[i][j] = cap;
+// adds an edge to adjacency matrix, while adjusting capacity_,
+void Graph::addEdge(unsigned int i, unsigned int j, unsigned int capacity){
+  adjacency_matrix_[i].push_back(j);
+  capacity_[i][j] = capacity;
 }
 
-fm_graph::fm_graph(IntegerVector r, IntegerVector c){
+Graph::Graph(IntegerVector in_degree, IntegerVector out_degree){
 
   // useful constants
-  source=0;
-  sink = r.size() + c.size() + 1;
-  unsigned int nvertices = sink + 1;
+  source_=0;
+  sink_ = in_degree.size() + out_degree.size() + 1;
+  unsigned int nvertices = sink_ + 1;
 
-  // allocating memory for data members
-  vertices = vector<fm_vertex>(nvertices);
-  adj = vector<vector<unsigned int> >(nvertices);
-  flow = vector<vector<unsigned int> >(nvertices, vector<unsigned int>(nvertices,0));
-  capacity = vector<vector<unsigned int> >(nvertices, vector<unsigned int>(nvertices,0));
+  // initialising data members
+  vertices_ = vector<Vertex>(nvertices);
+  adjacency_matrix_ = vector<vector<unsigned int> >(nvertices);
+  flow_ = vector<vector<unsigned int> >(nvertices, vector<unsigned int>(nvertices,0));
+  capacity_ = vector<vector<unsigned int> >(nvertices, vector<unsigned int>(nvertices,0));
 
-  // initialise edges between source and rows
-  for(unsigned int i=0;i!=r.size();++i){
-    add_edge(source, i+1, r(i));
-    add_edge(i+1, source, 0);
+  // initialise edges between source_ and rows
+  for(unsigned int i=0;i!=in_degree.size();++i){
+    addEdge(source_, i+1, in_degree(i));
+    addEdge(i+1, source_, 0);
   }
-  // initialise edges between columns and sink
-  for(unsigned int j=0;j!=c.size();++j){
-    add_edge(sink, r.size()+j+1, 0);
-    add_edge(r.size()+j+1, sink, c(j));
+  // initialise edges between columns and sink_
+  for(unsigned int j=0;j!=out_degree.size();++j){
+    addEdge(sink_, in_degree.size()+j+1, 0);
+    addEdge(in_degree.size()+j+1, sink_, out_degree(j));
   }
   // initialise all edges between rows and columns
-  for(unsigned int i=0;i!=r.size();++i){
-    for(unsigned int j=0;j!=c.size();++j){
-      add_edge(i+1, r.size()+j+1, 1);
-      add_edge(r.size()+j+1, i+1, 1);
+  for(unsigned int i=0;i!=in_degree.size();++i){
+    for(unsigned int j=0;j!=out_degree.size();++j){
+      addEdge(i+1, in_degree.size()+j+1, 1);
+      addEdge(in_degree.size()+j+1, i+1, 1);
     }
   }
 }
 
-bool fm_graph::find_path(){
+bool Graph::findPath(){
 
-  // initialise all vertices
-  for(vector<fm_vertex>::iterator it=vertices.begin(); it!=vertices.end(); ++it){
-    it->color = white;
-    it->distance = 0;
-    it->predecessor = 0;
+  // initialise all vertices_
+  for (auto& v: vertices_) {
+    v.color = white;
+    v.distance = 0;
+    v.predecessor = 0;
   }
 
-  vertices[source].color = gray;
-  vertices[source].distance = 0;
+  vertices_[source_].color = gray;
+  vertices_[source_].distance = 0;
 
   queue<unsigned int> Q;
-  Q.push(source);
+  Q.push(source_);
 
-  while(Q.size()!=0 && vertices[sink].color == white){
+  while (Q.size() != 0 && vertices_[sink_].color == white) {
     unsigned int u = Q.front();
     Q.pop();
     //loop through the adjacency list of vertex u
-    for(vector<unsigned int>::iterator it=adj[u].begin(); it!=adj[u].end(); ++it){
-      if(vertices[*it].color == white){
-        // add additional condition checking if move possible in residual network
-        if((int)capacity[u][*it] > (int)(flow[u][*it] - flow[*it][u])){
-          vertices[*it].color = gray;
-          vertices[*it].distance = vertices[u].distance+1;
-          vertices[*it].predecessor = u;
-          Q.push(*it);
-          if(*it == sink) return true;
+    for (auto& i: adjacency_matrix_[u]) {
+      if (vertices_[i].color == white) {
+        if ((int)capacity_[u][i] > (int)(flow_[u][i]-flow_[i][u])) {
+          vertices_[i].color = gray;
+          vertices_[i].distance = vertices_[u].distance + 1;
+          vertices_[i].predecessor = u;
+          Q.push(i);
+          if(i==sink_) return true;
         }
       }
     }
-    vertices[u].color = black;
+    vertices_[u].color = black;
   }
-  // there is no augmenting path to the sink...
+  // there is no augmenting path to the sink_...
   return false;
 }
 
-// given a path, calculates the flow across that path
-unsigned int fm_graph::calc_path_flow(){
+// given a path, calculates the flow_ across that path
+unsigned int Graph::calcPathFlow(){
   unsigned int v, f, edge_flow;
-  v = sink;
+  v = sink_;
 
-  while(v!=source){
-    edge_flow = capacity[vertices[v].predecessor][v] - flow[vertices[v].predecessor][v]
-      + flow[v][vertices[v].predecessor];
-    if(v==sink) f = edge_flow;
+  while(v!=source_){
+    edge_flow = capacity_[vertices_[v].predecessor][v] - flow_[vertices_[v].predecessor][v]
+      + flow_[v][vertices_[v].predecessor];
+    if(v==sink_) f = edge_flow;
     else f = min(edge_flow, f);
-    v = vertices[v].predecessor;
+    v = vertices_[v].predecessor;
   }
   return f;
 }
 
-// method updates the flow in the graph according to the path found
-void fm_graph::update_flow(unsigned int f){
-  unsigned int v=sink;
-  while(v!=source){
-    flow[vertices[v].predecessor][v] += f;
-    v=vertices[v].predecessor;
+// method updates the flow_ in the Graph according to the path found
+void Graph::updateFlow(unsigned int f){
+  unsigned int v=sink_;
+  while(v!=source_){
+    flow_[vertices_[v].predecessor][v] += f;
+    v=vertices_[v].predecessor;
   }
 }
 
-IntegerMatrix fm_graph::construct_matrix(IntegerVector r, IntegerVector c){
+IntegerMatrix Graph::constructMatrix(IntegerVector in_degree, IntegerVector out_degree){
 
-  IntegerMatrix x(r.size(),c.size());
+  IntegerMatrix x(in_degree.size(),out_degree.size());
 
-  for(unsigned int i=0; i!=r.size();++i)
-    for(unsigned int j=0; j!=r.size();++j)
-      x(i,j) = flow[i+1][r.size()+j+1] - flow[r.size()+j+1][i+1];
+  for(unsigned int i=0; i!=in_degree.size();++i)
+    for(unsigned int j=0; j!=in_degree.size();++j)
+      x(i,j) = flow_[i+1][in_degree.size()+j+1] - flow_[in_degree.size()+j+1][i+1];
 
   // validate the matrix
   vector<int> rwrong, cwrong;
-  for(unsigned int i=0; i!=r.size();++i){
+  for(unsigned int i=0; i!=in_degree.size();++i){
     int total = 0;
-    for(unsigned int j=0; j!=c.size();++j){
+    for(unsigned int j=0; j!=out_degree.size();++j){
       total += x(i,j);
     }
-    if(total!=r(i))
+    if(total!=in_degree(i))
       rwrong.push_back(i+1);
   }
 
-  for(unsigned int j=0; j!=c.size();++j){
+  for(unsigned int j=0; j!=out_degree.size();++j){
     int total = 0;
-    for(unsigned int i=0; i!=r.size();++i){
+    for(unsigned int i=0; i!=in_degree.size();++i){
       total += x(i,j);
     }
-    if(total!=c(j))
+    if(total!=out_degree(j))
       cwrong.push_back(j+1);
   }
 
   if(rwrong.size()>0 || cwrong.size()>0){
     std::stringstream Message;
-    Message<<"Could not construct matrix with given margins and fixed elements. Please ensure such a matrix exists.";
+    Message<<"Could not construct matrix with given margins and fixed_ elements. Please ensure such a matrix exists.";
     throw Rcpp::exception(Message.str().c_str());
   }
 
