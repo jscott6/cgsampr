@@ -10,6 +10,75 @@ Implementation of SG algorithm.
 using namespace Rcpp;
 using namespace UnWeighted;
 
+
+
+void Graph::Graph(IM adjacency_matrix, IM fixed)
+  : Graph(adjacency_matrix, fixed),
+    vertices_(std::vector<Vertex>(adjacency_matrix.ncol() + adjacency_matrix.nrow()))
+{
+  nrow = adjacency_matrix.nrow(); ncol = adjacency_matrix.ncol()
+  edges_ = (Edge**) malloc(nrow*sizeof(Edge));
+  for (int i = 0; i != nrow; ++i) edges_[i] = (Edge*) malloc(ncol*sizeof(Edge));
+  // initialise edges
+  // applies constructor directly to final address (avoids copy constructor)
+  // important to keep correct pointers in Vertex structures
+  for (int i = 0; i != nrow; ++i)
+    for (int j = 0; j != ncol; ++j)
+      new (&edges_[i][j]) Edge(&vertices_[nrow+j],&vertices_[i], fixed(i,j));
+
+  for (int i = 0; i != nrow + ncol; ++i) {
+    vertices_[i].index = i;
+    if (vertices_[i].in_edges.size() != 0)
+      initial_vertices_.push_back(&vertices_[i]);
+  }
+  if (initial_vertices_.size() == 0)
+    throw invalid_argument("Graph fully determined by specification");
+  return;
+}
+
+
+// complete sampling step HERE!
+void sampleStep() {
+  Vertex* u0 = sampleFromVector(initial_vertices_, generator_);
+  Edge* e = sampleFromVector(u0->in_edges, generator_);
+
+}
+
+
+
+Vertex* u0 = sampleFromVector(initial_vertices_, generator_);
+Edge* e = sampleFromVector(u0->in_edges, generator_);
+if (e->visits() == STAR) vec.push_back(e);
+e->increment();
+e = sampleNewFromVector(e->tail()->out_edges, e, generator_);
+if (e->visits() == STAR) vec.push_back(e);
+e->decrement();
+while (e->head() != u0) {
+  if (e->weight()) e = sampleNewFromVector(e->head()->in_edges, e, generator_);
+  else e = sampleFromVector(e->head()->in_edges, generator_);
+  if (e->visits() == STAR) vec.push_back(e);
+  e->increment();
+  if (!edges_[e->tail()->index][u0->index - adjacency_matrix_.nrow()].fixed())
+    e = &edges_[e->tail()->index][u0->index - adjacency_matrix_.nrow()];
+  else
+    e = sampleNewFromVector(e->tail()->out_edges, e, generator_);
+  if (e->visits() == STAR) vec.push_back(e);
+  e->decrement();
+}
+return;
+void updateAdjacencyMatrix() {
+
+};
+
+
+
+
+
+
+
+
+
+
 void Graph::SGStep(){
 
   // initialise

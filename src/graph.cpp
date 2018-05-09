@@ -132,50 +132,7 @@ void Graph::init(IntegerMatrix x0, IntegerMatrix f){
 
 
 
-/*
-constructs object from adjacency matrix and matrix indicating which entries
-are fixed_.
-Fixed matrix is determined by finding strongly connected components in D_x
-(procedure outlined in the paper)
-*/
 
-
-Graph::Graph(IntegerMatrix x0, IntegerMatrix f, bool digraph){
-  directed_ = digraph;
-  init(x0,f);
-}
-
-/*
-constructor utilising max flow_ (Edmund Karps) algorithm to attempt to
-reconstruct an admissible matrix from provided degree sequence. Note this
-procedure will be successful if and only if the degree sequence is GRAPHICAL
-*/
-
-
-Graph::Graph(IntegerVector r, IntegerVector c, IntegerMatrix f, bool digraph){
-
-  directed_ = digraph;
-
-  IntegerMatrix x0(r.size(),c.size());
-  bool sinkfound=true;
-  FeasibleMatrix::Graph G(r,c);
-  // adjust flow_ until no path is found in residual Graph
-  while(sinkfound){
-    sinkfound = G.findPath();
-    G.updateFlow(G.calcPathFlow());
-  }
-  // form matrix from Graph
-  x0 = G.constructMatrix(r,c);
-  init(x0, f);
-}
-
-
-/*
-Reconstructs adjacency matrix from adjacency lists zeros_ and ones_.
-Used to output adjacency matrices in the case of the SG sampler,
-which does not explicitly track adjacency matrices through the sampling
-procedure.
-*/
 
 // recreates adjacency_matrix_ from data structure
 void Graph::updateAdjacencyMatrix(){

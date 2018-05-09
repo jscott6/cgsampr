@@ -15,6 +15,36 @@ namespace Weighted {
     std::vector<Edge*> out_edges;
   };
 
+
+class AbstractEdge {
+using V = AbstractVertex;
+public:
+  AbstractEdge(V* const head, V* const tail, int const fixed)
+    : head_(head), tail_(tail) fixed_(fixed) {}
+  V* const head_, V* const tail_;
+  int const fixed;
+}
+
+
+namespace UnWeighted {
+  namespace Directed {
+    class Edge : public AbstractEdge {
+    public:
+      Edge(Vertex* const head, Vertex* const tail, int const fixed)
+        : AbstractEdge(head, tail, fixed) {}
+    };
+  }
+  namespace Undirected {
+    class Edge : public AbstractEdge {
+    public:
+
+    }
+  }
+}
+
+
+
+
   class Edge {
   public: // interface
     Edge(Vertex* const h, Vertex* const t, int* const w, const bool f);
