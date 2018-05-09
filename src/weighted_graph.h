@@ -3,7 +3,10 @@
 
 #include <Rcpp.h>
 #include <random>
-#include "edge.h"
+#include "interface.h"
+
+using IM = Rcpp::IntegerMatrix;
+using IV = Rcpp::IntegerVector;
 
 namespace Weighted {
 
@@ -11,24 +14,50 @@ namespace Weighted {
     int low, up;
   };
 
-  class Graph {
-  public:
-    Graph(Rcpp::IntegerMatrix x, Rcpp::IntegerMatrix f);
-    void sampleKernel(std::vector<Weighted::Edge*> & vec);
-    DeltaRange getDeltaRange(std::vector<Weighted::Edge*> & vec);
-    void updateWeights(std::vector<Weighted::Edge*>& vec, int delta);
-    void printData();
-    void sampleStep();
-    Rcpp::IntegerMatrix adjacency_matrix() { return adjacency_matrix_; };
-    Weighted::Edge** edges() { return edges_; };
+  class Edge;
 
-  private:
-    std::vector<Weighted::Vertex> vertices_;
-    Weighted::Edge** edges_;
-    std::vector<Weighted::Vertex*> initial_vertices_;
-    Rcpp::IntegerMatrix adjacency_matrix_;
-    std::default_random_engine generator_;
+  struct Vertex : public ::Vertex {
+    std::vector<Edge*> in_edges;
+    std::vector<Edge*> out_edges;
+  }
+
+  class Edge : public ::Edge {
+    public: // interface
+      Edge(Vertex* const head, Vertex* const tail, int* const weight, const bool fixed);
+      void increment();
+      void decrement();
+      // getters and setters
+      void reset() { visits_ = STAR; };
+      const Vertex* tail() { return tail_; };
+      const Vertex* head() { return head_; };
+      const bool fixed() { return fixed_; };
+      void weight(int);
+      int pos() { return pos_; };
+      int weight() { return *weight_; };
+      int visits() { return visits_; };
+    private:
+      int pos_, visits_;
+      void add();
+      void remove();
   };
+
+  namespace Directed {
+
+    class Graph : Directed::Graph {
+    public:
+      Graph(IM adjacency_matrix, IV fixed);
+      void sampleKernel(std::vector<Weighted::Edge*>& vec);
+      Weighted::DeltaRange getDeltaRange(std::vector<Weighted::Edge*> & vec);
+      void updateWeights(std::vector<Weighted::Edge*>& vec, int delta);
+      void printData();
+      Weighted::Edge** edges() { return edges_; }
+    private:
+      std::vector<Weighted::Vertex*> initial_vertices_;
+    };
+  }
 }
+
+
+
 
 #endif

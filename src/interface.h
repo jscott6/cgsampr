@@ -6,31 +6,30 @@
 #include <random>
 
 #define pure = 0;
-
-class GraphBase {
-using V = AbstractVertex;
-using E = AbstractEdge;
 using IM = Rcpp::IntegerMatrix;
 using IV = Rcpp::IntegerVector;
+
+struct Vertex {
+  int index;
+}
+
+class Edge {
 public:
-  AbstractGraph(IM adjacency_matrix, IM fixed);
-  AbstractGraph(IV in_degrees, IV out_degrees, IM f);
-  class EdgeBase {
-  using V = AbstractVertex;
-  public:
-    AbstractEdge(V* const head, V* const tail, int const fixed)
-      : head_(head), tail_(tail) fixed_(fixed) {}
-    V* const head_, V* const tail_;
-    int const fixed;
-  }
-  struct VertexBase {
-    int index;
-  }
+  Edge(Vertex* const head, Vertex* const tail, int const fixed, int* const weight)
+    : head_(head), tail_(tail), fixed_(fixed), weight_(weight) { }
+  Vertex* const head_, * const tail_;
+  int const fixed_;
+  int* const weight_;
+}
+
+class Graph {
+public:
+  Graph(IM adjacency_matrix, IM fixed);
+  Graph(IV in_degree, IV out_degree, IM fixed);
   Rcpp::List sample(int nsamples = 10000, int thin = 10, int burnin = 5000);
   void summary();
-  // getter methods
-  IM adjacency_matrix() { return adjacency_matrix_; };
-  IM fixed() { return fixed_; };
+  IM adjacency_matrix() { return adjacency_matrix_; }
+  IM fixed() { return fixed_; }
 private:
   std::default_random_engine generator_;
   IM adjacency_matrix_, fixed_;
@@ -39,76 +38,28 @@ private:
 };
 
 
+namespace Directed {
 
-class DirectedGraph : public GraphBase {
-using IM = Rcpp::IntegerMatrix;
-using IV = Rcpp::IntegerVector;
-public:
-  DirectedGraph(IM adjacency_matrix, IM fixed);
-  DirectedGraph(IV in_degrees, IV out_degrees, IM f);
-private:
-  std::vector<AbstractVertex> vertices_;
-  std::vector<std::vector<Edge> > edges_;
-};
-
-class UndirectedGraph : public GraphBase {
-using IM = Rcpp::IntegerMatrix;
-using IV = Rcpp::IntegerVector;
-public:
-  UndirectedGraph(IM adjacency_matrix, IM fixed);
-  UndirectedGraph(IV in_degrees, IV out_degrees, IM f);
-private:
-  std::vector<AbstractVertex> vertices_;
-  std::vector<std::vector<Edge> > edges_;
-};
-
-
-class WeightedEdge : public EdgeBase {
-using V = AbstractVertex;
-public:
-  WeightedEdge(V* const head, V* const tail, int const fixed, int * const weight)
-    : V(head, tail, fixed),
-      weight_(weight) {}
-  int * const weight_;
+  template <typename V, typename E>
+  class Graph : public ::Graph {
+  public:
+    Graph(IM adjacency_matrix, IM fixed);
+    Graph(IV in_degrees, IV out_degrees, IM fixed);
+  private:
+    std::vector<::V> vertices_;
+    std::vector<std::vector<::E> > edges_;
+  };
 }
 
-class UnweightedDirectedGraph : public DirectedGraph {
+  template <typename V, typename E>
+namespace Undirected {
 
-}
-
-
-
-
-
-class WeightedDirectedGraph : public DirectedGraph {}
-
-
-namespace Unweighted {
-  namespace Directed {
-    struct Vertex: AbstractVertex {
-      std::vector<Edge *> in_edges;
-      std::vector<Edge *> not_out_edges;
-    }
-    class Graph : public Directed::Graph {
-
-    };
-  }
-  namespace Undirected {
-    class Graph : public Undirected::Graph {
-
-    };
-  }
-}
-
-namespace Weighted {
-  namespace Directed {
-    class Graph : public Directed::Graph {
-
-    };
-  }
-  namespace Undirected {
-    class Graph : public Undirected::Graph {
-
-    };
-  }
+  class Graph : public ::Graph {
+  public:
+    Graph(IM adjacency_matrix, IM fixed);
+    Graph(IV in_degrees, IV out_degrees, IM fixed);
+  private:
+    std::vector<::V> vertices_;
+    std::vector<std::vector<::E> > edges_;
+  };
 }

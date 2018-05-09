@@ -3,49 +3,32 @@
 #include "AuxiliaryFunctions.h"
 using namespace std;
 using namespace Rcpp;
-using namespace Weighted;
+using namespace Weighted::Directed;
 
+using IM = IntegerMatrix;
+using IV = IntegerVector;
 
-int sampleDelta(const DeltaRange& dr, default_random_engine& gen) {
+int sampleDelta(const Weighted::DeltaRange& dr, default_random_engine& gen) {
   uniform_int_distribution<int> dist(dr.low, dr.up);
   return dist(gen);
 }
 
+Graph::Graph(IM adjacency_matrix, IM fixed)
+  : Directed::Graph<Weighted::Vertex, Weighted::Edge>(adjacency_matrix, fixed)
+{
+  auto const nrow = adjacency_matrix.nrow(), ncol = adjacency_matrix.ncol();
+  // initialise vertices
+
+  // initialise initial_vertices_
+  for (int i = 0; i != nrow + ncol; ++i) {
+    if (vertices_[i].in_edges.size() != 0)
+      initial_vertices_.push_back(&vertices_[i]);
+}
+
+
 Graph::Graph(Rcpp::IntegerMatrix x, Rcpp::IntegerMatrix f) {
-  // validate matrices
-  if (x.nrow() != f.nrow() || x.ncol() != f.ncol())
-    throw invalid_argument("Dimension of x and f do not match");
-  bool valid_x = true;
-  bool valid_f = true;
-  for (int i = 0; i != x.nrow(); ++i) {
-    for (int j = 0; j != x.ncol(); ++j) {
-      if (x(i,j) < 0) valid_x = false;
-      if (f(i,j) != 0 && f(i,j) != 1) valid_f = false;
-    }
-  }
-  if (!valid_x)
-    throw invalid_argument("All entries of x must be greater than or equal to zero");
-  else if (!valid_f)
-    throw invalid_argument("All entries of f must be binary valued");
-
-  adjacency_matrix_ = clone(x);
-  int nrow = x.nrow(), ncol = x.ncol();
-  // assuming biadjacency matrix
-  vertices_ = vector<Vertex>(nrow + ncol);
-  // allocate memory WITHOUT calling constructor
-  edges_ = (Edge**) malloc(nrow*sizeof(Edge));
-  for (int i = 0; i != nrow; ++i) edges_[i] = (Edge*) malloc(ncol*sizeof(Edge));
-
-  // initialise edges
-  // applies constructor directly to final address (avoids copy constructor)
-  // important to keep correct pointers in Vertex structures
-  for (int i = 0; i != nrow; ++i)
-    for (int j = 0; j != ncol; ++j)
-      new (&edges_[i][j]) Edge(&vertices_[nrow+j],&vertices_[i],
-        &adjacency_matrix_(i,j), f(i,j));
 
   for (int i = 0; i != nrow + ncol; ++i) {
-    vertices_[i].index = i;
     if (vertices_[i].in_edges.size() != 0)
       initial_vertices_.push_back(&vertices_[i]);
   }
