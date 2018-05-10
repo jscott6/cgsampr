@@ -1,5 +1,6 @@
 
 #include "FeasibleMatrix.h"
+#include <stdexcept>
 
 using namespace std;
 using namespace Rcpp;
@@ -132,9 +133,7 @@ IntegerMatrix Graph::constructMatrix(IntegerVector in_degree, IntegerVector out_
   }
 
   if(rwrong.size()>0 || cwrong.size()>0){
-    std::stringstream Message;
-    Message<<"Could not construct matrix with given margins and fixed_ elements. Please ensure such a matrix exists.";
-    throw Rcpp::exception(Message.str().c_str());
+    throw invalid_argument("Could not reconstruct graph from degrees. Please ensure at least one such graph exists");
   }
 
   return x;

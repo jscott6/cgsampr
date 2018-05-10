@@ -28,7 +28,6 @@ namespace Weighted {
       void add();
       void remove();
   };
-
 }
 
 #endif

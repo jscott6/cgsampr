@@ -5,6 +5,8 @@
 #include "AuxiliaryFunctions.h"
 using namespace std;
 using namespace Rcpp;
+using namespace Weighted::Directed;
+using namespace Weighted;
 
 context("Graph") {
 
@@ -12,28 +14,28 @@ context("Graph") {
     int s = 5;
     // test wrong dimensions
     IntegerMatrix x0(s, s), f0(s, 6);
-    expect_error_as(Weighted::Directed::Graph(x0, f0), invalid_argument);
+    expect_error_as(Graph(x0, f0), invalid_argument);
     // test x has negative entries
     IntegerMatrix x1(s, s), f1(s, s);
     x1(2,3) = -1;
-    expect_error_as(Weighted::Directed::Graph(x1, f1), invalid_argument);
+    expect_error_as(Graph(x1, f1), invalid_argument);
     // test f not binary
     IntegerMatrix x2(s, s), f2(s, s);
     f2(1,3) = 2;
-    expect_error_as(Weighted::Directed::Graph(x2, f2), invalid_argument);
+    expect_error_as(Graph(x2, f2), invalid_argument);
   }
 
   test_that("Initialiser initialises Edge pos member correctly ") {
     IntegerMatrix x(5, 5), f(5, 5);
     int nrow = x.nrow(), ncol = x.ncol();
     fill(x.begin(), x.end(), 10);
-    Weighted::Directed::Graph wg(x, f);
-    Weighted::Edge** edges = wg.edges();
+    Graph wg(x, f);
+    Edge** edges = wg.edges();
     bool res = true;
     for (int i = 0; i != nrow; ++i){
       for(int j = 0; j != ncol; ++j){
-        Weighted::Edge* e = &edges[i][j];
-        Weighted::Edge* p = e->head_->in_edges[e->pos()];
+        Edge* e = &edges[i][j];
+        Edge* p = e->head_->in_edges[e->pos()];
         if(p != e)
           res = false;
       }
@@ -45,15 +47,15 @@ context("Graph") {
     IntegerMatrix x(5, 5), f(5, 5);
     fill(x.begin(), x.end(), 10);
     f(2, 3) = 1;
-    Weighted::Directed::Graph wg(x, f);
-    Weighted::Edge** edges = wg.edges();
+    Graph wg(x, f);
+    Edge** edges = wg.edges();
     expect_true(edges[2][3].pos() == -1);
   }
 
   test_that("Initialiser throws error when matrix determined by specification"){
     IntegerMatrix x(5, 5) , f(5, 5);
     fill(f.begin(), f.end(), 1);
-    expect_error_as(Weighted::Directed::Graph(x, f), invalid_argument);
+    expect_error_as(Graph(x, f), invalid_argument);
   }
 
   test_that("sampleKernel() cycle valid"){
@@ -62,12 +64,12 @@ context("Graph") {
     fill(x.begin(), x.end(), 10);
     fill(x1.begin(),x1.end(),10);
     for (int i = 0; i != 3; ++i) f1(i,i)=1;
-    Weighted::Directed::Graph wg(x, f);
-    Weighted::Directed::Graph wg1(x1, f1);
+    Graph wg(x, f);
+    Graph wg1(x1, f1);
     // length should be four when no elements are fixed_
     bool len = true, len_fixed = true, pattern=true, newedge=true;
     for (int i = 0; i != nsamples; ++i) {
-      vector<Weighted::Edge*> cycle, cycle1;
+      vector<Edge*> cycle, cycle1;
       wg.sampleKernel(cycle);
       wg.updateWeights(cycle, 0);
       wg1.sampleKernel(cycle1);

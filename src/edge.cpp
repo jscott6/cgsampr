@@ -28,7 +28,6 @@ void Edge::decrement() {
 
 // adds edge to in 'in edges' of head Vertex
 // assumes edge is NOT already referenced in Vertex data
-// will only be called as part of weight()
 void Edge::add() {
   pos_ = head_->in_edges.size();
   head_->in_edges.push_back(this);

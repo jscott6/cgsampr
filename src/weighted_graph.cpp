@@ -14,13 +14,15 @@ int sampleDelta(const DeltaRange& dr, default_random_engine& gen) {
 }
 
 Graph::Graph(IM adjacency_matrix, IM fixed)
-  : ::Directed::Graph<Vertex,Edge>(adjacency_matrix, fixed)
+  : ::Directed::Graph<Vertex,Edge>(adjacency_matrix, fixed, false)
 {
   auto const nrow = adjacency_matrix.nrow(), ncol = adjacency_matrix.ncol();
   // initialise initial_vertices_
   for (int i = 0; i != nrow + ncol; ++i)
     if (vertices_[i].in_edges.size() != 0)
       initial_vertices_.push_back(&vertices_[i]);
+  if(initial_vertices_.size()==0)
+    throw invalid_argument("Matrix fully determined by specification");
 }
 
 void Graph::sampleKernel(vector<Edge*>& vec) {

@@ -29,18 +29,18 @@ namespace Base {
 
   class Graph {
   public:
-    Graph(IM adjacency_matrix, IM fixed);
-    Graph(IV in_degree, IV out_degree, IM fixed);
+    Graph(IM adjacency_matrix, IM fixed, bool search);
+    Graph(IV in_degree, IV out_degree, IM fixed, bool search);
     virtual ~Graph() { }
     Rcpp::List sample(int nsamples = 10000, int thin = 10, int burnin = 5000);
     void summary();
-    virtual void sampleStep() pure;
+    virtual void sampleStep();
     IM adjacency_matrix() { return adjacency_matrix_; }
     IM fixed() { return fixed_; }
   protected:
     IM adjacency_matrix_, fixed_;
     std::default_random_engine generator_;
-    virtual void updateAdjacencyMatrix() pure;
+    virtual void updateAdjacencyMatrix();
   };
 
 

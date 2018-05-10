@@ -8,24 +8,8 @@
 using namespace std;
 using namespace Rcpp;
 using namespace Base;
-using IM = Rcpp::IntegerMatrix;
-using IV = Rcpp::IntegerVector;
-
-IM init_adjacency_matrix_(IV in_degree, IV out_degree, IM fixed) {
-  bool sinkfound = true;
-  FeasibleMatrix::Graph fmg(in_degree, out_degree);
-  // adjust flow_ until no path is found in residual Graph
-  while (sinkfound) {
-    sinkfound = fmg.findPath();
-    fmg.updateFlow(fmg.calcPathFlow());
-  }
-  return fmg.constructMatrix(in_degree,out_degree);
-}
-
-IM init_fixed_(IM adjacency_matrix, IM fixed) {
-    StronglyConnectedComponents::Graph sccg(adjacency_matrix, fixed);
-    return sccg.fixed_values(fixed);
-}
+using IM = IntegerMatrix;
+using IV = IntegerVector;
 
 void checks(IM adjacency_matrix, IM fixed) {
   if (adjacency_matrix.nrow() != fixed.nrow() ||
@@ -45,23 +29,65 @@ void checks(IM adjacency_matrix, IM fixed) {
     throw invalid_argument("All entries of f must be binary valued");
 }
 
-default_random_engine init_generator_() {
+ void checkGraphDetermined(IM fixed) {
+  bool undetermined = true;
+  for (int i = 0; i != fixed.nrow(); ++i){
+    for (int j = 0; j != fixed.ncol(); ++j){
+      if (fixed(i,j)==0) undetermined = false;
+    }
+  }
+  if(!undetermined)
+    throw invalid_argument("Matrix fully determined by specification");
+}
+
+void checkDegrees(IV in_degree, IV out_degree, IM fixed) {
+  if(in_degree.size() != fixed.nrow() || out_degree.size() != fixed.ncol())
+    throw invalid_argument("Degree sequences and fixed matrix of incompatible dimensions");
+  for(int i = 0; i != in_degree.size(); ++i)
+    if(in_degree(i)<0)
+      throw invalid_argument("in-degree sequence must be positive");
+  for(int i = 0; i != out_degree.size(); ++i)
+    if(out_degree(i)<0)
+      throw invalid_argument("out-degree sequence must be positive");
+}
+
+
+IM initFixed(IM adjacency_matrix, IM fixed, bool search) {
+    checks(adjacency_matrix, fixed);
+    if(!search) return fixed;
+    StronglyConnectedComponents::Graph sccg(adjacency_matrix, fixed);
+    fixed = sccg.fixed_values(fixed);
+    checkGraphDetermined(fixed);
+    return fixed;
+}
+
+IM initAdjacencyMatrix(IV in_degree, IV out_degree, IM fixed) {
+  checkDegrees(in_degree, out_degree, fixed);
+  bool sinkfound = true;
+  FeasibleMatrix::Graph fmg(in_degree, out_degree);
+  // adjust flow_ until no path is found in residual Graph
+  while (sinkfound) {
+    sinkfound = fmg.findPath();
+    fmg.updateFlow(fmg.calcPathFlow());
+  }
+  return fmg.constructMatrix(in_degree,out_degree);
+}
+
+default_random_engine initGenerator() {
   auto seed = chrono::system_clock::now().time_since_epoch().count();
   return default_random_engine(seed);
 }
 
-Graph::Graph(IM adjacency_matrix, IM fixed)
-  : adjacency_matrix_(adjacency_matrix),
-    fixed_(init_fixed_(adjacency_matrix, fixed)),
-    generator_(init_generator_())
-{
-  checks(adjacency_matrix, fixed);
-}
 
-Graph::Graph(IV in_degree, IV out_degree, IM fixed)
-  : adjacency_matrix_(init_adjacency_matrix_(in_degree, out_degree, fixed)),
-    fixed_(init_fixed_(adjacency_matrix_, fixed)),
-    generator_(init_generator_())
+Graph::Graph(IM adjacency_matrix, IM fixed, bool search)
+  : adjacency_matrix_(adjacency_matrix),
+    fixed_(initFixed(adjacency_matrix, fixed, search)),
+    generator_(initGenerator()) { }
+
+Graph::Graph(IV in_degree, IV out_degree, IM fixed ,bool search)
+  : adjacency_matrix_(initAdjacencyMatrix(in_degree, out_degree, fixed)),
+    fixed_(initFixed(adjacency_matrix_, fixed, search)),
+    generator_(initGenerator())
 {
   checks(adjacency_matrix_, fixed);
 }
@@ -81,4 +107,12 @@ List Graph::sample(int nsamples, int thin, int burnin) {
 void Graph::summary() {
   Rcout << "This is intended to provide summary information about the graph";
   printMatrix(adjacency_matrix_);
+}
+
+void Graph::sampleStep() {
+
+}
+
+void Graph::updateAdjacencyMatrix() {
+
 }
