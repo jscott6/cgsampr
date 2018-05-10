@@ -27,11 +27,11 @@ void printVertexData(Weighted::Vertex& v) {
   Rcout << "------------" << endl;
   Rcout <<  setw(8) << "Tail: ";
   for (int i = 0; i != v.in_edges.size(); ++i)
-    Rcout << setw(2) << v.in_edges[i]->tail()->index + 1 << " ";
+    Rcout << setw(2) << v.in_edges[i]->tail_->index + 1 << " ";
   Rcout << endl;
   Rcout <<  setw(8) << "Head: ";
   for(int i = 0; i != v.in_edges.size(); ++i)
-    Rcout << setw(2) << v.in_edges[i]->head()->index + 1 << " ";
+    Rcout << setw(2) << v.in_edges[i]->head_->index + 1 << " ";
   Rcout << endl;
   Rcout <<  setw(8) << "Weight: ";
   for(int i = 0; i != v.in_edges.size(); ++i)
@@ -42,12 +42,12 @@ void printVertexData(Weighted::Vertex& v) {
   Rcout << "------------" << endl;
   Rcout <<  setw(8) << "Tail: ";
   for (int i = 0; i != v.out_edges.size(); ++i) {
-    Rcout << setw(2) << v.out_edges[i]->tail()->index + 1<< " ";
+    Rcout << setw(2) << v.out_edges[i]->tail_->index + 1<< " ";
   }
   Rcout << endl;
   Rcout <<  setw(8) << "Head: ";
   for (int i = 0; i != v.out_edges.size(); ++i) {
-      Rcout << setw(2) << v.out_edges[i]->head()->index + 1<< " ";
+      Rcout << setw(2) << v.out_edges[i]->head_->index + 1<< " ";
   }
   Rcout << endl;
   Rcout <<  setw(8) << "Weight: ";

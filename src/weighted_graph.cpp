@@ -4,37 +4,23 @@
 using namespace std;
 using namespace Rcpp;
 using namespace Weighted::Directed;
-
+using namespace Weighted;
 using IM = IntegerMatrix;
 using IV = IntegerVector;
 
-int sampleDelta(const Weighted::DeltaRange& dr, default_random_engine& gen) {
+int sampleDelta(const DeltaRange& dr, default_random_engine& gen) {
   uniform_int_distribution<int> dist(dr.low, dr.up);
   return dist(gen);
 }
 
 Graph::Graph(IM adjacency_matrix, IM fixed)
-  : Directed::Graph<Weighted::Vertex, Weighted::Edge>(adjacency_matrix, fixed)
+  : ::Directed::Graph<Vertex,Edge>(adjacency_matrix, fixed)
 {
   auto const nrow = adjacency_matrix.nrow(), ncol = adjacency_matrix.ncol();
-  // initialise vertices
-
   // initialise initial_vertices_
-  for (int i = 0; i != nrow + ncol; ++i) {
+  for (int i = 0; i != nrow + ncol; ++i)
     if (vertices_[i].in_edges.size() != 0)
       initial_vertices_.push_back(&vertices_[i]);
-}
-
-
-Graph::Graph(Rcpp::IntegerMatrix x, Rcpp::IntegerMatrix f) {
-
-  for (int i = 0; i != nrow + ncol; ++i) {
-    if (vertices_[i].in_edges.size() != 0)
-      initial_vertices_.push_back(&vertices_[i]);
-  }
-  if (initial_vertices_.size() == 0)
-    throw invalid_argument("Graph fully determined by specification");
-  return;
 }
 
 void Graph::sampleKernel(vector<Edge*>& vec) {
@@ -43,18 +29,18 @@ void Graph::sampleKernel(vector<Edge*>& vec) {
     Edge* e = sampleFromVector(u0->in_edges, generator_);
     if (e->visits() == STAR) vec.push_back(e);
     e->increment();
-    e = sampleNewFromVector(e->tail()->out_edges, e, generator_);
+    e = sampleNewFromVector(e->tail_->out_edges, e, generator_);
     if (e->visits() == STAR) vec.push_back(e);
     e->decrement();
-    while (e->head() != u0) {
-      if (e->weight()) e = sampleNewFromVector(e->head()->in_edges, e, generator_);
-      else e = sampleFromVector(e->head()->in_edges, generator_);
+    while (e->head_ != u0) {
+      if (e->weight()) e = sampleNewFromVector(e->head_->in_edges, e, generator_);
+      else e = sampleFromVector(e->head_->in_edges, generator_);
       if (e->visits() == STAR) vec.push_back(e);
       e->increment();
-      if (!edges_[e->tail()->index][u0->index - adjacency_matrix_.nrow()].fixed())
-        e = &edges_[e->tail()->index][u0->index - adjacency_matrix_.nrow()];
+      if (!edges_[e->tail_->index][u0->index - adjacency_matrix_.nrow()].fixed_)
+        e = &edges_[e->tail_->index][u0->index - adjacency_matrix_.nrow()];
       else
-        e = sampleNewFromVector(e->tail()->out_edges, e, generator_);
+        e = sampleNewFromVector(e->tail_->out_edges, e, generator_);
       if (e->visits() == STAR) vec.push_back(e);
       e->decrement();
     }
@@ -85,6 +71,10 @@ void Graph::sampleStep() {
   int delta = sampleDelta(dr,generator_);
   updateWeights(cycle, delta);
   return;
+}
+
+void Graph::updateAdjacencyMatrix(){
+
 }
 
 void Graph::printData() {

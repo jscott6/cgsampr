@@ -6,7 +6,7 @@ Exposes Graph class to R via Rcpp Modules
 */
 
 
-
+/*
 #include "graph.h"
 
 // [[Rcpp::plugins(cpp11)]]
@@ -41,3 +41,4 @@ RCPP_MODULE(Graph_module){
             "Returns matrix tracking_ which table values are fixed_")
   ;
 }
+*/

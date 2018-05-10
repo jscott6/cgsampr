@@ -4,13 +4,11 @@
 using namespace std;
 using namespace Weighted;
 
-Edge::Edge(Vertex* const h,Vertex* const t, int* const w, const bool f) :
-  head_(h),
-  tail_(t),
-  fixed_(f),
-  weight_(w),
-  pos_(-1),
-  visits_(STAR) {
+Edge::Edge(Vertex* const head, Vertex* const tail, int* const weight, const bool fixed)
+  : Base::Edge<Vertex>(head, tail, weight, fixed),
+    pos_(-1),
+    visits_(STAR)
+{
   if (*weight_ > 0 && !fixed_) add();
   if (!fixed_) tail_->out_edges.push_back(this);
   return;
