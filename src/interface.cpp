@@ -80,7 +80,7 @@ default_random_engine initGenerator() {
 
 
 Graph::Graph(IM adjacency_matrix, IM fixed, bool search)
-  : adjacency_matrix_(adjacency_matrix),
+  : adjacency_matrix_(clone(adjacency_matrix)),
     fixed_(initFixed(adjacency_matrix, fixed, search)),
     generator_(initGenerator()) { }
 

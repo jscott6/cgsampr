@@ -6,9 +6,11 @@
 using namespace std;
 using namespace Rcpp;
 
-context("Edge"){
+context("Edge")
+{
 
-  test_that("Initialiser updates Vertex and Edge data") {
+  test_that("Initialiser updates Vertex and Edge data")
+  {
     Weighted::Vertex h, t1, t2, tf;
     int w1 = 1, w2 = 1, wf = 1;
     Weighted::Edge e1(&h, &t1, &w1, false);
@@ -23,7 +25,8 @@ context("Edge"){
     expect_true(e2.pos() == 1);
   }
 
-  test_that("weight() from zero to pos updates Vertex and Edge data") {
+  test_that("weight() from zero to pos updates Vertex and Edge data")
+  {
     Weighted::Vertex h, t;
     int w = 0;
     Weighted::Edge e(&h, &t, &w, false);
@@ -33,7 +36,8 @@ context("Edge"){
     expect_true(e.pos() == 0);
   }
 
-  test_that("weight() from pos to zero updates Vertex and Edge data") {
+  test_that("weight() from pos to zero updates Vertex and Edge data")
+  {
     Weighted::Vertex h, t1, t2;
     int w1 = 1, w2 = 1;
     Weighted::Edge e1(&h, &t1, &w1, false);

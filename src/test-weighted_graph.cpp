@@ -10,21 +10,6 @@ using namespace Weighted;
 
 context("Graph") {
 
-  test_that("Initialiser exits gracefully with prohibited input") {
-    int s = 5;
-    // test wrong dimensions
-    IntegerMatrix x0(s, s), f0(s, 6);
-    expect_error_as(Graph(x0, f0), invalid_argument);
-    // test x has negative entries
-    IntegerMatrix x1(s, s), f1(s, s);
-    x1(2,3) = -1;
-    expect_error_as(Graph(x1, f1), invalid_argument);
-    // test f not binary
-    IntegerMatrix x2(s, s), f2(s, s);
-    f2(1,3) = 2;
-    expect_error_as(Graph(x2, f2), invalid_argument);
-  }
-
   test_that("Initialiser initialises Edge pos member correctly ") {
     IntegerMatrix x(5, 5), f(5, 5);
     int nrow = x.nrow(), ncol = x.ncol();
@@ -50,12 +35,6 @@ context("Graph") {
     Graph wg(x, f);
     Edge** edges = wg.edges();
     expect_true(edges[2][3].pos() == -1);
-  }
-
-  test_that("Initialiser throws error when matrix determined by specification"){
-    IntegerMatrix x(5, 5) , f(5, 5);
-    fill(f.begin(), f.end(), 1);
-    expect_error_as(Graph(x, f), invalid_argument);
   }
 
   test_that("sampleKernel() cycle valid"){
