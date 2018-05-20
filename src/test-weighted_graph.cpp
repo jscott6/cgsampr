@@ -3,10 +3,19 @@
 #include <stdexcept>
 #include "weighted_graph.h"
 #include "AuxiliaryFunctions.h"
+#include <utility>
+#include <string>
+#include <fstream>
 using namespace std;
 using namespace Rcpp;
 using namespace Weighted::Directed;
 using namespace Weighted;
+
+
+void getVerticesCycleData(const vector<Edge *> &vec,const DeltaRange& dr);
+bool populateTestVertexData(vector<pair<int, int>> coords, vector<int> weights, vector<CycleData> expected);
+void printCycleData(const CycleData& cycle_data);
+bool testBoundaryWeights(vector<pair<int, int>> coords, vector<int> weights, Factor expected);
 
 context("Graph") {
 
@@ -72,4 +81,186 @@ context("Graph") {
     expect_true(pattern);
     expect_true(newedge);
   }
+
+  test_that("Vertex cycle data populates as expected")
+  {
+    // test case 1
+    expect_true(populateTestVertexData({{0, 0}, {0, 1}, {1, 1}, {1, 2}, {2, 2}, {2, 1}, {3, 1}, {3, 0}},
+                           {2, 1, 1, 2, 2, 1, 1, 2},
+                           {{1, 0, 0, 0, 0},
+                            {2, 2, 2, 2, 2},
+                            {1, 0, 0, 0, 0},
+                            {0, 0, 0, 0, 0}}));
+
+    // test case 2
+    expect_true(populateTestVertexData({{0, 0}, {0, 1}, {1, 1}, {1, 2}, {2, 2}, {2, 1}, {3, 1}, {3, 0}},
+                           {2, 1, 2, 2, 2, 2, 1, 2},
+                           {{1, 0, 0, 0, 0},
+                            {2, 1, 1, 1, 1},
+                            {1, 0, 0, 0, 0},
+                            {0, 0, 0, 0, 0}}));
+
+    // test case 3
+    expect_true(populateTestVertexData({{0, 0}, {0, 1}, {1, 1}, {1, 2}, {2, 2}, {2, 1}, {3, 1}, {3, 0}},
+                           {2, 2, 2, 1, 1, 2, 2, 2},
+                           {{1, 0, 0, 0, 0},
+                            {2, 0, 0, 0, 0},
+                            {1, 1, 1, 1, 1},
+                            {0, 0, 0, 0, 0}}));
+
+    // test case 4
+    expect_true(populateTestVertexData({{0, 0}, {0, 1}, {1, 1}, {1, 0}},
+                           {1, 2, 2, 1},
+                           {{1, 1, 1, 1, 1},
+                            {1, 0, 0, 0, 0}}));
+
+    // test case 5
+    expect_true(populateTestVertexData({{0, 0}, {0, 1}, {1, 1}, {1, 0}},
+                           {2, 1, 1, 2},
+                           {{1, 0, 0, 0, 0},
+                            {1, 1, 1, 1, 1}}));
+
+    // test case 6
+    expect_true(populateTestVertexData({{0, 0}, {0, 1}, {1, 1}, {1, 0}},
+                           {1, 1, 1, 1},
+                           {{1, 1, 1, 1, 1},
+                            {1, 1, 1, 1, 1}}));
+
+    //test case 7
+    expect_true(populateTestVertexData({{0, 0}, {0, 1}, {1, 1}, {1, 2}, {2, 2}, {2, 1}, {3, 1}, {3, 2}, {4, 2}, {4, 1}, {5, 1}, {5, 0}},
+                           {2, 1, 1, 2, 2, 2, 2, 2, 2, 1, 1, 2},
+                           {{1, 0, 0, 0, 0},
+                            {3, 2, 2, 2, 2},
+                            {2, 0, 0, 0, 0},
+                            {0, 0, 0, 0, 0},
+                            {0, 0, 0, 0, 0},
+                            {0, 0, 0, 0, 0}}));
+
+    //test case 8
+    expect_true(populateTestVertexData({{0, 0}, {0, 1}, {1, 1}, {1, 2}, {2, 2}, {2, 1}, {0, 1}, {0, 0}},
+                           {2, 2, 1, 2, 2, 1, 2, 2},
+                           {{1, 0, 0, 0, 0},
+                            {2, 1, 1, 1, 1},
+                            {1, 0, 0, 0, 0}}));
+
+    //test case 9
+    expect_true(populateTestVertexData({{0, 0}, {0, 1}, {1, 1}, {1, 2}, {0, 2}, {0, 1}, {2, 1}, {2, 0}},
+                           {2, 2, 2, 2, 2, 2, 1, 2},
+                           {{1, 0, 0, 0, 0},
+                            {2, 1, 2, 1, 1},
+                            {1, 0, 0, 0, 0}}));
+  }
+
+  test_that("Generates expected boundary weights for test scenarios")
+  {
+    expect_true(testBoundaryWeights({{0, 0}, {0, 1}, {1, 1}, {1, 2}, {2, 2}, {2, 1}, {3, 1}, {3, 0}},
+                           {2, 1, 1, 2, 2, 1, 1, 2},
+                           {9./8., 9./8.}));
+
+    expect_true(testBoundaryWeights({{0, 0}, {0, 1}, {1, 1}, {1, 2}, {2, 2}, {2, 1}, {3, 1}, {3, 0}},
+                           {2, 1, 2, 2, 2, 2, 1, 2},
+                           {3./4., 3./4.}));
+
+    expect_true(testBoundaryWeights({{0, 0}, {0, 1}, {1, 1}, {1, 2}, {2, 2}, {2, 1}, {3, 1}, {3, 0}},
+                           {2, 2, 2, 1, 1, 2, 2, 2},
+                           {1./2.,1./2.}));
+
+    expect_true(testBoundaryWeights({{0, 0}, {0, 1}, {1, 1}, {1, 0}},
+                           {1, 2, 2, 1},
+                           {1,1}));
+
+    expect_true(testBoundaryWeights({{0, 0}, {0, 1}, {1, 1}, {1, 0}},
+                           {2, 1, 1, 2},
+                           {1./2.,1./2.}));
+
+    expect_true(testBoundaryWeights({{0, 0}, {0, 1}, {1, 1}, {1, 0}},
+                           {1, 1, 1, 1},
+                           {1,1}));
+
+    expect_true(testBoundaryWeights({{0, 0}, {0, 1}, {1, 1}, {1, 2}, {2, 2}, {2, 1}, {3, 1}, {3, 2}, {4, 2}, {4, 1}, {5, 1}, {5, 0}},
+                           {2, 1, 1, 2, 2, 2, 2, 2, 2, 1, 1, 2},
+                           {125./96., 125./96.}));
+
+    expect_true(testBoundaryWeights({{0, 0}, {0, 1}, {1, 1}, {1, 2}, {2, 2}, {2, 1}, {0, 1}, {0, 0}},
+                           {2, 2, 1, 2, 2, 1, 2, 2},
+                           {1,1}));
+
+    expect_true(testBoundaryWeights({{0, 0}, {0, 1}, {1, 1}, {1, 2}, {0, 2}, {0, 1}, {2, 1}, {2, 0}},
+                           {2, 2, 2, 2, 2, 2, 1, 2},
+                           {1,1./2.}));
+    }
+
+}
+
+bool populateTestVertexData(vector<pair<int, int>> coords, vector<int> weights, vector<CycleData> expected)
+{
+  int n = 0;
+  for (const auto &coord : coords)
+    n = max(n, max(coord.first, coord.second) + 1);
+  IntegerMatrix adj(n, n), fixed(n, n);
+  for (int i = 0; i != coords.size(); i++)
+    adj(coords[i].first, coords[i].second) = weights[i];
+  Graph wg(adj, fixed);
+  Edge **edges = wg.edges();
+  vector<Edge *> cycle;
+  int i = -1;
+  for (const auto &coord : coords)
+  {
+    vector<Edge*>::iterator iter = find(cycle.begin(), cycle.end(), &edges[coord.first][coord.second]);
+    if (iter == cycle.end())
+      cycle.push_back(&edges[coord.first][coord.second]);
+    if ((++i) % 2)
+      edges[coord.first][coord.second].incrementOdd();
+    else
+      edges[coord.first][coord.second].incrementEven();
+  }
+
+  DeltaRange dr = wg.getDeltaRange(cycle);
+  getVerticesCycleData(cycle, dr);
+  bool good = true;
+  for (const auto& e : cycle)
+  {
+    int idx = e->head_->index - n;
+    if (
+        e->head_->cycle_data.visits != expected[idx].visits ||
+        e->head_->cycle_data.up_zeros != expected[idx].up_zeros ||
+        e->head_->cycle_data.up_zero_visits != expected[idx].up_zero_visits ||
+        e->head_->cycle_data.low_zeros != expected[idx].low_zeros ||
+        e->head_->cycle_data.low_zero_visits != expected[idx].low_zero_visits)
+        good = false;
+  }
+  return good;
+}
+
+
+bool testBoundaryWeights(vector<pair<int, int>> coords, vector<int> weights, Factor expected)
+{
+  int n = 0;
+  for (const auto &coord : coords)
+    n = max(n, max(coord.first, coord.second) + 1);
+  IntegerMatrix adj(n, n), fixed(n, n);
+  for (int i = 0; i != coords.size(); i++)
+    adj(coords[i].first, coords[i].second) = weights[i];
+  Graph wg(adj, fixed);
+  Edge **edges = wg.edges();
+  vector<Edge *> cycle;
+  int i = -1;
+  for (const auto &coord : coords)
+  {
+    vector<Edge*>::iterator iter = find(cycle.begin(), cycle.end(), &edges[coord.first][coord.second]);
+    if (iter == cycle.end())
+      cycle.push_back(&edges[coord.first][coord.second]);
+    if ((++i) % 2)
+      edges[coord.first][coord.second].incrementOdd();
+    else
+      edges[coord.first][coord.second].incrementEven();
+  }
+
+  DeltaRange dr = wg.getDeltaRange(cycle);
+  Factor factor = wg.getBoundaryWeights(cycle, dr);
+
+  if(abs(factor.low - expected.low)<1e-6 && abs(factor.up - expected.up) < 1e-6)
+    return true;
+  else
+    return false;
 }

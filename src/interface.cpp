@@ -30,13 +30,13 @@ void checks(IM adjacency_matrix, IM fixed) {
 }
 
  void checkGraphDetermined(IM fixed) {
-  bool undetermined = true;
+  bool determined = true;
   for (int i = 0; i != fixed.nrow(); ++i){
     for (int j = 0; j != fixed.ncol(); ++j){
-      if (fixed(i,j)==0) undetermined = false;
+      if (fixed(i,j)==0) determined = false;
     }
   }
-  if(!undetermined)
+  if(determined)
     throw invalid_argument("Matrix fully determined by specification");
 }
 

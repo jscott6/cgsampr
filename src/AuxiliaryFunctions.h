@@ -8,12 +8,13 @@
 #include <random>
 #include "edge.h"
 
-void printMatrix(Rcpp::IntegerMatrix mat);
-void printVertexData(Weighted::Vertex &v);
+void printMatrix(const Rcpp::IntegerMatrix mat);
+void printVertexData(const Weighted::Vertex &v);
+void printEdgeData(const Weighted::Edge &e);
 
 // prints a vector to output stream (assumes T printable)
 template <class T>
-void printVec(std::vector<T> vec)
+void printVec(const std::vector<T> vec)
 {
   for (typename std::vector<T>::const_iterator it = vec.begin();
        it != vec.end(); ++it)

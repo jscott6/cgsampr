@@ -21,6 +21,19 @@ struct DeltaRange
   }
 };
 
+struct Factor
+{
+  double low, up;
+  Factor()
+      : low(1.), up(1.)
+  {
+  }
+  Factor(double low, double up)
+      : low(low), up(up)
+  {
+  }
+};
+
 namespace Directed
 {
 
@@ -32,15 +45,17 @@ public:
   ::Weighted::DeltaRange getDeltaRange(std::vector<::Weighted::Edge *> &vec);
   void updateWeights(std::vector<::Weighted::Edge *> &vec, int delta);
   void sampleStep() override;
-  void printData();
+  void printData() const;
   ::Weighted::Edge **edges() { return edges_; }
-  void getBoundaryWeights(std::vector<Weighted::Edge *> &vec);
+  Factor getBoundaryWeights(const std::vector<Weighted::Edge *> &vec, const Weighted::DeltaRange& dr);
 
 private:
   std::vector<::Weighted::Vertex *> initial_vertices_;
   void updateAdjacencyMatrix() override;
 };
 } // namespace Directed
+
 } // namespace Weighted
+
 
 #endif

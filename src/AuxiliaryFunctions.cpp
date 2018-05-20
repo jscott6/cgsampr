@@ -4,7 +4,7 @@ using namespace std;
 using namespace Rcpp;
 
 // prints a 2-d array to output stream
-void printMatrix(IntegerMatrix vec)
+void printMatrix(const IntegerMatrix vec)
 {
   int n = vec.nrow();
   Rcout << endl;
@@ -21,7 +21,19 @@ void printMatrix(IntegerMatrix vec)
   Rcout << endl;
 }
 
-void printVertexData(Weighted::Vertex &v)
+
+// This if for debugging purposes
+
+void printEdgeData(const Weighted::Edge &e)
+{
+  Rcout << "Edge: " << e.tail_->index + 1 << "->" << e.head_->index + 1 << endl;
+  Rcout << "Weight: " << e.weight() << endl;
+  Rcout << "even: " << e.even() << " odd: " << e.odd() << endl;
+  Rcout << endl;
+}
+
+
+void printVertexData(const Weighted::Vertex &v)
 {
   Rcout << "------------------------" << endl;
   Rcout << "VERTEX " << v.index + 1 << endl;
@@ -62,5 +74,13 @@ void printVertexData(Weighted::Vertex &v)
     Rcout << setw(2) << v.out_edges[i]->weight() << " ";
   }
   Rcout << endl;
+  Rcout << endl;
+  Rcout << setw(8) << "Possible Out Edges" << endl;
+  Rcout << "------------" << endl;
+  Rcout << "visits: " << v.cycle_data.visits << endl;
+  Rcout << "up_zero_visits: " << v.cycle_data.up_zero_visits << endl;
+  Rcout << "low_zero_visits: " << v.cycle_data.low_zero_visits << endl;
+  Rcout << "up_zeros: " << v.cycle_data.up_zeros << endl;
+  Rcout << "low_zeros: " << v.cycle_data.low_zeros << endl;
   return;
 }

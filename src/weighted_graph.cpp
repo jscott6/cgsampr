@@ -8,9 +8,21 @@ using namespace Weighted;
 using IM = IntegerMatrix;
 using IV = IntegerVector;
 
-int sampleDelta(const DeltaRange &dr, default_random_engine &gen)
+void getVerticesCycleData(const vector<Edge *> &vec, const DeltaRange& dr);
+void updateFactor(Vertex *v, float x, Factor& factor);
+double power(float x, uint n);
+
+
+int sampleDelta(const DeltaRange &dr, const Factor factor, default_random_engine &gen)
 {
-  uniform_int_distribution<int> dist(dr.low, dr.up);
+  float c = dr.up - dr.low - 1 + factor.low + factor.up;
+  uniform_real_distribution<float> unif(0.0, 1.0);
+  float u = unif(gen);
+  if (u < factor.low/c)
+    return dr.low;
+  else if (u < (factor.low + factor.up)/c)
+    return dr.up;
+  uniform_int_distribution<int> dist(dr.low + 1, dr.up - 1);
   return dist(gen);
 }
 
@@ -75,11 +87,11 @@ int Graph::sampleKernel(vector<Edge *> &vec)
   Edge *e = sampleFromVector(u0->in_edges, generator_);
   if (e->even() == STAR && e->odd() == STAR)
     vec.push_back(e);
-  e->increment();
+  e->incrementEven();
   e = sampleNewFromVector(e->tail_->out_edges, e, generator_);
   if (e->even() == STAR && e->odd() == STAR)
     vec.push_back(e);
-  e->decrement();
+  e->incrementOdd();
   while (e->head_ != u0)
   {
     if (e->weight())
@@ -92,14 +104,14 @@ int Graph::sampleKernel(vector<Edge *> &vec)
       e = sampleFromVector(e->head_->in_edges, generator_);
     if (e->even() == STAR && e->odd() == STAR)
       vec.push_back(e);
-    e->increment();
+    e->incrementEven();
     if (!edges_[e->tail_->index][u0->index - adjacency_matrix_.nrow()].fixed_)
       e = &edges_[e->tail_->index][u0->index - adjacency_matrix_.nrow()];
     else
       e = sampleNewFromVector(e->tail_->out_edges, e, generator_);
     if (e->even() == STAR && e->odd() == STAR)
       vec.push_back(e);
-    e->decrement();
+    e->incrementOdd();
   }
   return 0;
 }
@@ -139,20 +151,28 @@ void Graph::sampleStep()
   // we are storing unique edges, so maximum size cannot
   // exceed nrow*ncol
   vector<Edge *> cycle;
-  if (sampleKernel(cycle)){
+  int discard = sampleKernel(cycle);
+  if (discard){
     reset(cycle);
     return;
   }
   DeltaRange dr = getDeltaRange(cycle);
-  int delta = sampleDelta(dr, generator_);
+  Factor factor = getBoundaryWeights(cycle, dr);
+  //for(const auto& e : cycle)
+  //  printEdgeData(*e);
+  //Rcout << "[" << dr.low << "," << dr.up << "]" << endl;
+  //Rcout << "low: " << factor.low << " up: " << factor.up << endl;
+  int delta = sampleDelta(dr, factor, generator_);
+  //Rcout << "delta: " << delta << endl;
   updateWeights(cycle, delta);
+  reset(cycle);
 }
 
 void Graph::updateAdjacencyMatrix()
 {
 }
 
-void Graph::printData()
+void Graph::printData() const
 {
   printMatrix(adjacency_matrix_);
   for (int i = 0; i != vertices_.size(); ++i)
@@ -175,23 +195,59 @@ double power(float x, uint n)
 }
 
 
-void updateFactor(Vertex *v, int x, double& factor)
+Factor Graph::getBoundaryWeights(const vector<Edge *> &vec, const DeltaRange& dr)
 {
-  if (!v->even)
+  // ensure correct data populated before calculation
+  getVerticesCycleData(vec, dr);
+  Factor factor;
+
+  // adjust for out edges of first and last vertices
+  double sum = vec.front()->tail_->out_edges.size() + vec.back()->tail_->out_edges.size() - 2;
+  factor.up *= (vec.back()->tail_->out_edges.size()-1)/sum;
+  factor.low *= (vec.front()->tail_->out_edges.size()-1)/sum;
+
+  // first vertex treated separately
+  float x = (float) (vec.front()->head_->in_edges.size() + ((dr.up == 0) ? vec.front()->head_->cycle_data.up_zeros : 0));
+  factor.up *= x/(x - vec.front()->head_->cycle_data.up_zeros );
+  factor.low *= x/(x - vec.front()->head_->cycle_data.low_zeros);
+  vec.front()->head_->cycle_data.reset();
+  for (int i = 1 ; i != vec.size(); i++)
   {
-    factor *= power((float) x / (float) (x - v->zeros+1), v->even_zeros);
-    factor *= power((float) x / (float) (x - v->zeros), v->even - v->even_zeros);
-    v->reset();
+    updateFactor(vec[i]->head_,
+                 vec[i]->head_->in_edges.size() 
+                  + ((dr.up == 0) ? vec[i]->head_->cycle_data.up_zeros : 0) - 1,
+                factor);
   }
+  return factor;
 }
 
 
-
-void Graph::getBoundaryWeights(vector<Edge *> &vec) 
+void getVerticesCycleData(const vector<Edge *> &vec, const DeltaRange& dr)
 {
-  // store number of even side visits to each vertex
-  for (const auto& e: vec)
+  for (const auto &e : vec)
   {
-    e->head_->even += e->even();
+    e->head_->cycle_data.visits += e->even();
+    if (!(e->weight() + (e->even() - e->odd()) * dr.up))
+    {
+      e->head_->cycle_data.up_zero_visits += e->odd();
+      e->head_->cycle_data.up_zeros++;
+    }
+    if (!(e->weight() + (e->even() - e->odd()) * dr.low))
+    {
+      e->head_->cycle_data.low_zero_visits += e->even();
+      e->head_->cycle_data.low_zeros++;
+    }
+  }
+}
+
+void updateFactor(Vertex *v, float x, Factor& factor)
+{
+  if (v->cycle_data.visits)
+  {
+    factor.up *= power(x / (x - v->cycle_data.up_zeros+1), v->cycle_data.up_zero_visits);
+    factor.up *= power(x / (x - v->cycle_data.up_zeros), v->cycle_data.visits - v->cycle_data.up_zero_visits);
+    factor.low *= power(x / (x - v->cycle_data.low_zeros+1), v->cycle_data.low_zero_visits);
+    factor.low *= power(x / (x - v->cycle_data.low_zeros), v->cycle_data.visits - v->cycle_data.low_zero_visits);
+    v->cycle_data.reset();
   }
 }

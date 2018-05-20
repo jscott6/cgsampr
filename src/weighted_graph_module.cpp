@@ -14,6 +14,6 @@ RCPP_MODULE(WeightedGraph_module)
   class_<Weighted::Directed::Graph>("WeightedGraph")
       .derives<Base::Graph>("BaseGraph")
       .constructor<IntegerMatrix, IntegerMatrix>()
-      .method("printData", &Weighted::Directed::Graph::printData, "Prints internal data structure to R console")
+      .const_method("printData", &Weighted::Directed::Graph::printData, "Prints internal data structure to R console")
       .method("sampleStep", &Weighted::Directed::Graph::sampleStep, "Performs a single sampling step");
 }

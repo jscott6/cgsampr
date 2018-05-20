@@ -7,30 +7,13 @@ using namespace Weighted;
 Edge::Edge(Vertex *const head, Vertex *const tail, int *const weight, const bool fixed)
     : Base::Edge<Vertex>(head, tail, weight, fixed),
       pos_(-1),
-      visits_(STAR)
+      even_(STAR),
+      odd_(STAR)
 {
   if (*weight_ > 0 && !fixed_)
     add();
   if (!fixed_)
     tail_->out_edges.push_back(this);
-  return;
-}
-
-void Edge::increment()
-{
-  if (visits_ == STAR)
-    visits_ = 1;
-  else
-    visits_++;
-  return;
-}
-
-void Edge::decrement()
-{
-  if (visits_ == STAR)
-    visits_ = -1;
-  else
-    visits_--;
   return;
 }
 
