@@ -1,4 +1,4 @@
-Package: cgsampr
+Package: graphs
 Type: Package
 Title: Samplers for Conditional Inference in Graphs
 Version: 0.0.0.9000
@@ -22,4 +22,3 @@ LinkingTo:
 	testthat
 Suggests: 
 	testthat
-LazyData: true

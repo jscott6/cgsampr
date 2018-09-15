@@ -1,4 +1,4 @@
 
 (function() {
-  .Call("run_testthat_tests", PACKAGE = "cgsampr")
+  .Call("run_testthat_tests", PACKAGE = "graphs")
 })
