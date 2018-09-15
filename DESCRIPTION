@@ -1,4 +1,4 @@
-Package: graphs
+Package: cgsampr
 Type: Package
 Title: Samplers for Conditional Inference in Graphs
 Version: 0.0.0.9000
