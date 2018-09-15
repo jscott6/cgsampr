@@ -6,6 +6,8 @@
 #include "edge.h"
 #include "directed_graph.h"
 
+Rcpp::IntegerMatrix init_fixed(Rcpp::IntegerMatrix adjacency_matrix, Rcpp::IntegerMatrix fixed);
+
 namespace Weighted
 {
 
@@ -37,6 +39,9 @@ struct Factor
 namespace Directed
 {
 
+namespace SG
+{
+
 class Graph : public ::Directed::Graph<::Weighted::Vertex, ::Weighted::Edge>
 {
 public:
@@ -53,6 +58,27 @@ private:
   std::vector<::Weighted::Vertex *> initial_vertices_;
   void updateAdjacencyMatrix() override;
 };
+
+} // namespace SG
+
+namespace DG
+{
+
+class Graph : public ::Directed::Graph<::Weighted::Vertex, ::Weighted::Edge>
+{
+public:
+  Graph(IM adjacency_matrix, IM fixed);
+  int sampleKernel(std::vector<::Weighted::Edge *> &vec);
+  ::Weighted::DeltaRange getDeltaRange(std::vector<::Weighted::Edge *> &vec);
+  void updateWeights(std::vector<::Weighted::Edge *> &vec, int delta);
+  void sampleStep() override;
+
+private:
+  void updateAdjacencyMatrix() override;
+};
+
+} // namespace DG
+
 } // namespace Directed
 
 } // namespace Weighted

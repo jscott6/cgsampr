@@ -1,1 +1,2 @@
-loadModule("WeightedGraph", TRUE)
+loadModule("graph_module", TRUE)
+

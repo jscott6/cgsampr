@@ -25,6 +25,7 @@ namespace Base {
     V* const head_, * const tail_;
     int* const weight_;
     int const fixed_;
+    int fixed() const {return fixed_; }
   };
 
   class Graph {

@@ -32,6 +32,13 @@ void printEdgeData(const Weighted::Edge &e)
   Rcout << endl;
 }
 
+void printEdgeData(const Unweighted::Edge &e)
+{
+  Rcout << "Edge: " << e.tail_->index + 1 << "->" << e.head_->index + 1 << endl;
+  Rcout << "Weight: " << e.weight() << endl;
+  Rcout << endl;
+}
+
 
 void printVertexData(const Weighted::Vertex &v)
 {
@@ -84,3 +91,55 @@ void printVertexData(const Weighted::Vertex &v)
   Rcout << "low_zeros: " << v.cycle_data.low_zeros << endl;
   return;
 }
+
+
+
+void printVertexData(const Unweighted::Vertex &v)
+{
+  Rcout << "------------------------" << endl;
+  Rcout << "VERTEX " << v.index + 1 << endl;
+  Rcout << "------------------------" << endl;
+  Rcout << endl;
+  Rcout << setw(8) << "In Edges" << endl;
+  Rcout << "------------" << endl;
+  Rcout << setw(8) << "Tail: ";
+  for (int i = 0; i != v.in_edges.size(); ++i)
+    Rcout << setw(2) << v.in_edges[i]->tail_->index + 1 << " ";
+  Rcout << endl;
+  Rcout << setw(8) << "Head: ";
+  for (int i = 0; i != v.in_edges.size(); ++i)
+    Rcout << setw(2) << v.in_edges[i]->head_->index + 1 << " ";
+  Rcout << endl;
+  Rcout << setw(8) << "Weight: ";
+  for (int i = 0; i != v.in_edges.size(); ++i)
+    Rcout << setw(2) << v.in_edges[i]->weight() << " ";
+  Rcout << endl;
+  Rcout << endl;
+  Rcout << setw(8) << "Not Out Edges" << endl;
+  Rcout << "------------" << endl;
+  Rcout << setw(8) << "Tail: ";
+  for (int i = 0; i != v.not_out_edges.size(); ++i)
+  {
+    Rcout << setw(2) << v.not_out_edges[i]->tail_->index + 1 << " ";
+  }
+  Rcout << endl;
+  Rcout << setw(8) << "Head: ";
+  for (int i = 0; i != v.not_out_edges.size(); ++i)
+  {
+    Rcout << setw(2) << v.not_out_edges[i]->head_->index + 1 << " ";
+  }
+  Rcout << endl;
+  Rcout << setw(8) << "Weight: ";
+  for (int i = 0; i != v.not_out_edges.size(); ++i)
+  {
+    Rcout << setw(2) << v.not_out_edges[i]->weight() << " ";
+  }
+  Rcout << endl;
+  Rcout << endl;
+  return;
+}
+
+
+
+
+

@@ -8,7 +8,7 @@
 #include <fstream>
 using namespace std;
 using namespace Rcpp;
-using namespace Weighted::Directed;
+using namespace Weighted::Directed::SG;
 using namespace Weighted;
 
 

@@ -1,5 +1,5 @@
 
 library(testthat)
-library(graphs)
+library(cgsampr)
 
-test_check("graphs")
+test_check("cgsampr")

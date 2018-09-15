@@ -1,12 +1,18 @@
-Package: graphs
+Package: cgsampr
 Type: Package
-Title: Implements samplers for simple graphs conditional on vertex level data.
-Version: 1.0
-Date: 2017-12-02
+Title: Samplers for Conditional Inference in Graphs
+Version: 0.0.0.9000
+Date: 2018-09-15
 Author@R: c(
 	person("Scott", "James", email="james.scott15@imperial.ac.uk", role = c("aut","cre")),
 	person("Gandy", "Axel", email = "a.gandy@imperial.ac.uk", role = "aut"))
-Description: This package provides an efficient object oriented implementation of novel MCMC methods for sampling random graphs uniformly conditional on observed vertex degrees, and a specified set of arcs/edges. These techniques find application in motif detection and hypothesis testing. 
+Description: This package provides efficient MCMC algorithms for uniform 
+	sampling of graphs conditional on vertex level data. The algorithms use
+	state dependent kernel selection to efficiently traverse the state space.
+	Two settings are considered: uniform sampling from unweighted graphs 
+	conditional on vertex degrees, and uniform sampling from weighted graphs
+	conditional on vertex strengths. In addition, it is possible to fix an 
+	arbitrary set of possible edges as present or absent in all the sampled graphs.
 License: MIT
 Imports: 
 	methods, 
@@ -16,3 +22,4 @@ LinkingTo:
 	testthat
 Suggests: 
 	testthat
+LazyData: true

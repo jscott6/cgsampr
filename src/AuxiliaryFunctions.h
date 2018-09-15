@@ -7,6 +7,7 @@
 #include <iomanip>
 #include <random>
 #include "edge.h"
+#include "graph.h"
 
 void printMatrix(const Rcpp::IntegerMatrix mat);
 void printVertexData(const Weighted::Vertex &v);
@@ -34,6 +35,14 @@ T sampleFromVector(const std::vector<T> &vec, std::default_random_engine &gen)
   std::uniform_int_distribution<int> dist(0, vec.size() - 1);
   return vec[dist(gen)];
 }
+
+template <class T>
+T * sampleReferenceFromVector(std::vector<T> &vec, std::default_random_engine &gen)
+{
+  std::uniform_int_distribution<int> dist(0, vec.size() - 1);
+  return &(vec[dist(gen)]);
+}
+
 
 // generic function to sample NEW element from a vector
 // given some vector, return a new random (uniform) element from it

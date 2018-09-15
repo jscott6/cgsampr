@@ -3,7 +3,7 @@
 #include "AuxiliaryFunctions.h"
 using namespace std;
 using namespace Rcpp;
-using namespace Weighted::Directed;
+using namespace Weighted::Directed::SG;
 using namespace Weighted;
 using IM = IntegerMatrix;
 using IV = IntegerVector;
@@ -12,15 +12,16 @@ void getVerticesCycleData(const vector<Edge *> &vec, const DeltaRange& dr);
 void updateFactor(Vertex *v, float x, Factor& factor);
 double power(float x, uint n);
 
-
+// samples Delta from its conditional distribution
 int sampleDelta(const DeltaRange &dr, const Factor factor, default_random_engine &gen)
 {
+  if(dr.up==dr.low) return 0;
   float c = dr.up - dr.low - 1 + factor.low + factor.up;
   uniform_real_distribution<float> unif(0.0, 1.0);
   float u = unif(gen);
-  if (u < factor.low/c)
+  if (u <= factor.low/c)
     return dr.low;
-  else if (u < (factor.low + factor.up)/c)
+  else if (u <= (factor.low + factor.up)/c)
     return dr.up;
   uniform_int_distribution<int> dist(dr.low + 1, dr.up - 1);
   return dist(gen);
@@ -139,8 +140,10 @@ void reset(vector<Edge *> &vec)
 
 void Graph::updateWeights(vector<Edge *> &vec, int delta)
 {
-  for (auto &e : vec)
+  for (auto &e : vec){
     e->weight(e->weight() + (e->even() - e->odd())* delta);
+  }
+    
   reset(vec);
 }
 
@@ -158,12 +161,7 @@ void Graph::sampleStep()
   }
   DeltaRange dr = getDeltaRange(cycle);
   Factor factor = getBoundaryWeights(cycle, dr);
-  //for(const auto& e : cycle)
-  //  printEdgeData(*e);
-  //Rcout << "[" << dr.low << "," << dr.up << "]" << endl;
-  //Rcout << "low: " << factor.low << " up: " << factor.up << endl;
   int delta = sampleDelta(dr, factor, generator_);
-  //Rcout << "delta: " << delta << endl;
   updateWeights(cycle, delta);
   reset(cycle);
 }
@@ -220,6 +218,7 @@ Factor Graph::getBoundaryWeights(const vector<Edge *> &vec, const DeltaRange& dr
   }
   return factor;
 }
+
 
 
 void getVerticesCycleData(const vector<Edge *> &vec, const DeltaRange& dr)
