@@ -1,8 +1,19 @@
 # Prerequisites
 *.d
 
+# History files
+.Rhistory
+.Rapp.history
+
+# Session Data files
+.RData
+
 # vscode settings
 *.vscode
+
+# System files
+*.DS_Store
+
 # Compiled Object files
 *.slo
 *.lo

@@ -18,17 +18,6 @@ Please read the [introduction to cgsampr](./vignettes/introduction.Rmd).
 	
 Note that the package currently implements samplers only for directed graphs. In future versions, we hope to extend the algorithms to the undirected case.
 
-
-## Example Usage
-
-~~~~
-adj <- diag(2)
-f <- matrix(0, 2,2)
-g <- new(UnweightedGraph, adj, f)
-g$sample(5,0,0)
-~~~~
-
-
 ### Installation
 
 The package is easily installed using devtools. For example, you could use the command
@@ -36,6 +25,19 @@ The package is easily installed using devtools. For example, you could use the c
 ~~~~
 devtools::install_github()
 ~~~~
+
+## Example Usage
+
+~~~~
+library(cgsampr)
+adj <- diag(2)
+f <- matrix(0, 2,2)
+g <- new(UnweightedGraph, adj, f)
+g$sample(5,0,0)
+~~~~
+
+
+
 
 
 
