@@ -14,11 +14,14 @@ Description: This package provides efficient MCMC algorithms for uniform
 	conditional on vertex strengths. In addition, it is possible to fix an 
 	arbitrary set of possible edges as present or absent in all the sampled graphs.
 License: MIT
-Imports: 
+Imports:
 	methods, 
 	Rcpp (>= 0.12.14)
-LinkingTo: 
+LinkingTo:
 	Rcpp,
 	testthat
-Suggests: 
-	testthat
+Suggests:
+	testthat,
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
