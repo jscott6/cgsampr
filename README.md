@@ -1,4 +1,4 @@
-# graphs
+# cgsampr
 
 This package provides efficient MCMC algorithms for uniform 
 	sampling of graphs conditional on vertex level data. The algorithms use
