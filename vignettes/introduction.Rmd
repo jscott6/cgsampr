@@ -2,7 +2,7 @@
 title: "Introduction to cgsampr"
 author: "James Scott"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output: rmarkdown::github_document
 vignette: >
   %\VignetteIndexEntry{Introduction to cgsampr}
   %\VignetteEngine{knitr::rmarkdown}

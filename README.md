@@ -14,7 +14,7 @@ The algorithms are flexible, and require little tuning to the problem at hand. I
 	
 The package has a wide variety of possible applications; including network science, psychometrics, community ecology and categorical data analysis.
 	
-Please read the [introduction to cgsampr](./vignettes/introduction.Rmd).
+Please read the [introduction to cgsampr](./vignettes/introduction.md).
 	
 Note that the package currently implements samplers only for directed graphs. In future versions, we hope to extend the algorithms to the undirected case.
 
