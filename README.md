@@ -23,7 +23,7 @@ Note that the package currently implements samplers only for directed graphs. In
 The package is easily installed using devtools. For example, you could use the command
 
 ~~~~
-devtools::install_github()
+devtools::install_github("jscott6/cgsampr")
 ~~~~
 
 ## Example Usage

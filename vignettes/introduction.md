@@ -364,7 +364,7 @@ And compute a p-value
 
 ``` r
 mean(samples >= X0)
-#> [1] 0.00772
+#> [1] 0.00955
 ```
 
 Based on the p-value, we may reject the hypothesis of indepdendence at a significance of *α* = 0.01.
@@ -390,7 +390,7 @@ and again, we can compute a p-value.
 
 ``` r
 mean(samples_ds >= X0)
-#> [1] 0.00778
+#> [1] 0.00991
 ```
 
 In this simple example, the Diaconis and Sturmfels algorithm is efficient. However, if the table were sparse, the chain would mix very slowly. Additionally, if the table is incomplete (i.e. some elements are fixed), the resulting Markov chain is not gauranteed to be irreducible.
