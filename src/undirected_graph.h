@@ -14,7 +14,6 @@ class Graph : public Base::Graph
 {
 public:
   Graph(IM adjacency_matrix, IM fixed, bool search);
-  Graph(IV in_degrees, IV out_degrees, IM fixed, bool search);
   ~Graph();
 
 protected:
@@ -52,12 +51,6 @@ Graph<V, E>::Graph(IM adjacency_matrix, IM fixed, bool search)
   init();
 }
 
-template <typename V, typename E>
-Graph<V, E>::Graph(IV in_degree, IV out_degree, IM fixed, bool search) :
-    : Base::Graph(in_degree, out_degree, fixed, search)
-{
-  init();
-}
 
 template <typename V, typename E>
 Graph<V, E>::~Graph()

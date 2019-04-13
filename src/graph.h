@@ -33,7 +33,6 @@ class Graph : public ::Directed::Graph<::Unweighted::Vertex, ::Unweighted::Edge>
 {
   public:
     Graph(IM adjacency_matrix, IM fixed);
-    Graph(IV in_degree, IV out_degree, IM fixed);
     void printData() const;
     void sampleStep() override;
 

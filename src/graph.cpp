@@ -38,13 +38,6 @@ Graph::Graph(IM adjacency_matrix, IM fixed)
 }
 
 
-Graph::Graph(IV in_degree, IV out_degree, IM fixed)
-    : ::Directed::Graph<Vertex, Edge>(in_degree, out_degree, fixed, true),
-        initial_vertices_(init_initial_vertices(adjacency_matrix_, fixed_, vertices_))
-{
-}
-
-
 void Graph::printData() const
 {
     for (const auto &v : vertices_)

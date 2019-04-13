@@ -140,8 +140,6 @@ void printVertexData(const Unweighted::Vertex &v)
   return;
 }
 
-
-
 // [[Rcpp::export]]
 IM constructGraph(IV out_degree, IV in_degree, IM fixed)
 {

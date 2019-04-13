@@ -30,11 +30,4 @@ context("Graph") {
     expect_error_as(Graph(x, f, true), invalid_argument);
   }
 
-  test_that("Initialiser from degrees exits gracefully with prohibited input") {
-    int s = 5;
-
-
-
-  }
-
 }

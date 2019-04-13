@@ -1,6 +1,6 @@
 
 /*
-Module implements the Edmond-Karps algorithm for for finding a viable graph
+Implements the Edmond-Karps algorithm for for finding a viable initial graph
 */
 
 

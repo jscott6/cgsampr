@@ -31,7 +31,6 @@ namespace Base {
   class Graph {
   public:
     Graph(IM adjacency_matrix, IM fixed, bool search);
-    Graph(IV in_degree, IV out_degree, IM fixed, bool search);
     virtual ~Graph() { }
     Rcpp::List sample(int nsamples = 10000, int thin = 10, int burnin = 5000);
     void summary();

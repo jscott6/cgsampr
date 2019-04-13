@@ -38,7 +38,6 @@ RCPP_MODULE(graph_module)
     class_<Unweighted::Directed::Graph>("UnweightedGraph")
         .derives<Base::Graph>("Base")
         .constructor<IntegerMatrix,IntegerMatrix>()
-        .constructor<IntegerVector,IntegerVector,IntegerMatrix>()
         .const_method("printData", &Unweighted::Directed::Graph::printData, "Prints internal data structure to R console")
         .method("sampleStep", &Unweighted::Directed::Graph::sampleStep, "Performs a single sampling step");
 }
