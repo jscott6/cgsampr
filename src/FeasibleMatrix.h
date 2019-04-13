@@ -8,13 +8,16 @@
 
 namespace FeasibleMatrix {
 
+  using IM = Rcpp::IntegerMatrix;
+  using IV = Rcpp::IntegerVector;
+
   enum VertexColor{white, gray, black};
 
   struct Vertex {
     unsigned int distance;
     VertexColor color;
     unsigned int predecessor;
-    Vertex() :
+    Vertex() : 
       distance(0),
       color(white),
       predecessor(0) {};
@@ -25,12 +28,12 @@ namespace FeasibleMatrix {
     std::vector<std::vector<unsigned int> > adjacency_matrix_, flow_, capacity_;
     unsigned int source_, sink_;
   public:
-    Graph(Rcpp::IntegerVector, Rcpp::IntegerVector);
+    Graph(IV, IV, IM);
     void addEdge(unsigned int, unsigned int, unsigned int);
     bool findPath();
     unsigned int calcPathFlow();
     void updateFlow(unsigned int);
-    Rcpp::IntegerMatrix constructMatrix(Rcpp::IntegerVector, Rcpp::IntegerVector);
+    Rcpp::IntegerMatrix constructMatrix(IV, IV);
   };
 }
 

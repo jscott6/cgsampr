@@ -2,7 +2,7 @@
 #include <iostream>
 #include "interface.h"
 #include "StronglyConnectedComponents.h"
-#include "FeasibleMatrix.h"
+#include "construct_graph.h"
 #include "AuxiliaryFunctions.h"
 
 using namespace std;
@@ -64,13 +64,14 @@ IM initFixed(IM adjacency_matrix, IM fixed, bool search) {
 IM initAdjacencyMatrix(IV in_degree, IV out_degree, IM fixed) {
   checkDegrees(in_degree, out_degree, fixed);
   bool sinkfound = true;
-  FeasibleMatrix::Graph fmg(in_degree, out_degree);
+  ConstructGraph::Graph fmg(in_degree, out_degree, fixed);
   // adjust flow_ until no path is found in residual Graph
   while (sinkfound) {
     sinkfound = fmg.findPath();
     fmg.updateFlow(fmg.calcPathFlow());
   }
-  return fmg.constructMatrix(in_degree,out_degree);
+  //printMatrix(fmg.constructMatrix(in_degree,out_degree));
+  return fmg.constructWeightMatrix();
 }
 
 default_random_engine initGenerator() {

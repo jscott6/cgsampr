@@ -2,9 +2,11 @@
 #include "AuxiliaryFunctions.h"
 using namespace std;
 using namespace Rcpp;
+using IV = Rcpp::IntegerVector;
+using IM = Rcpp::IntegerMatrix;
 
 // prints a 2-d array to output stream
-void printMatrix(const IntegerMatrix vec)
+void printMatrix(const IM vec)
 {
   int n = vec.nrow();
   Rcout << endl;
@@ -20,7 +22,6 @@ void printMatrix(const IntegerMatrix vec)
   }
   Rcout << endl;
 }
-
 
 // This if for debugging purposes
 
@@ -138,6 +139,32 @@ void printVertexData(const Unweighted::Vertex &v)
   Rcout << endl;
   return;
 }
+
+
+
+// [[Rcpp::export]]
+IM constructGraph(IV out_degree, IV in_degree, IM fixed)
+{
+  checkInputs(in_degree, out_degree, fixed);
+  bool sinkfound = true;
+  ConstructGraph::Graph net(out_degree, in_degree, fixed);
+  // adjust flow until no path remains in the residual Graph
+  while (sinkfound) {
+    sinkfound = net.findPath();
+    net.updateFlow(net.calcPathFlow());
+  }
+  return net.constructWeightMatrix();
+}
+
+void checkInputs(IV in_degree, IV out_degree, IM fixed) {
+  if(in_degree.size() != fixed.nrow() || out_degree.size() != fixed.ncol())
+    throw invalid_argument("Degree vectors and fixed matrix of incompatible dimensions");
+  if(min(out_degree) < 0 || min(in_degree) < 0)
+    throw invalid_argument("Degree vectors must be non-negative");
+  if(min(fixed) < 0 || max(fixed) > 1)
+    throw invalid_argument("All entries of fixed matrix must be binary valued");
+}
+
 
 
 

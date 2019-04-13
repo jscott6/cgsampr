@@ -12,7 +12,7 @@ void Graph::addEdge(unsigned int i, unsigned int j, unsigned int capacity){
   capacity_[i][j] = capacity;
 }
 
-Graph::Graph(IntegerVector in_degree, IntegerVector out_degree){
+Graph::Graph(IV in_degree, IV out_degree){
 
   // useful constants
   source_=0;
@@ -104,7 +104,7 @@ void Graph::updateFlow(unsigned int f){
   }
 }
 
-IntegerMatrix Graph::constructMatrix(IntegerVector in_degree, IntegerVector out_degree){
+IntegerMatrix Graph::constructMatrix(IV in_degree, IV out_degree){
 
   IntegerMatrix x(in_degree.size(),out_degree.size());
 

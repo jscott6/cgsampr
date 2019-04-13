@@ -8,11 +8,15 @@
 #include <random>
 #include "edge.h"
 #include "graph.h"
+#include "construct_graph.h"
+
+
 
 void printMatrix(const Rcpp::IntegerMatrix mat);
 void printVertexData(const Weighted::Vertex &v);
 void printEdgeData(const Weighted::Edge &e);
-
+Rcpp::IntegerMatrix constructGraph(Rcpp::IntegerVector, Rcpp::IntegerVector, Rcpp::IntegerMatrix);
+void checkInputs(Rcpp::IntegerVector, Rcpp::IntegerVector, Rcpp::IntegerMatrix);
 // prints a vector to output stream (assumes T printable)
 template <class T>
 void printVec(const std::vector<T> vec)
