@@ -81,15 +81,20 @@ Graph::Graph(IM adjacency_matrix, IM fixed)
     throw invalid_argument("Matrix fully determined by specification");
 }
 
+
+
 int Graph::sampleKernel(vector<Edge *> &vec)
 {
   // find a cycle
+  vector<Edge *> longvec;
   Vertex *u0 = sampleFromVector(initial_vertices_, generator_);
   Edge *e = sampleFromVector(u0->in_edges, generator_);
+  longvec.push_back(e);
   if (e->even() == STAR && e->odd() == STAR)
     vec.push_back(e);
   e->incrementEven();
   e = sampleNewFromVector(e->tail_->out_edges, e, generator_);
+  longvec.push_back(e);
   if (e->even() == STAR && e->odd() == STAR)
     vec.push_back(e);
   e->incrementOdd();
@@ -103,6 +108,7 @@ int Graph::sampleKernel(vector<Edge *> &vec)
     }
     else
       e = sampleFromVector(e->head_->in_edges, generator_);
+    longvec.push_back(e);
     if (e->even() == STAR && e->odd() == STAR)
       vec.push_back(e);
     e->incrementEven();
@@ -110,12 +116,54 @@ int Graph::sampleKernel(vector<Edge *> &vec)
       e = &edges_[e->tail_->index][u0->index - adjacency_matrix_.nrow()];
     else
       e = sampleNewFromVector(e->tail_->out_edges, e, generator_);
+    longvec.push_back(e);
     if (e->even() == STAR && e->odd() == STAR)
       vec.push_back(e);
     e->incrementOdd();
+
+    for (const auto &ed : longvec)
+      printEdgeData(*ed);
+
+    Rcout << "Length: " << longvec.size() << endl;
   }
   return 0;
 }
+
+// int Graph::sampleKernel(vector<Edge *> &vec)
+// {
+//   // find a cycle
+//   Vertex *u0 = sampleFromVector(initial_vertices_, generator_);
+//   Edge *e = sampleFromVector(u0->in_edges, generator_);
+//   if (e->even() == STAR && e->odd() == STAR)
+//     vec.push_back(e);
+//   e->incrementEven();
+//   e = sampleNewFromVector(e->tail_->out_edges, e, generator_);
+//   if (e->even() == STAR && e->odd() == STAR)
+//     vec.push_back(e);
+//   e->incrementOdd();
+//   while (e->head_ != u0)
+//   {
+//     if (e->weight())
+//     {
+//       if(e->head_->in_edges.size() == 1) 
+//         return 1;
+//       e = sampleNewFromVector(e->head_->in_edges, e, generator_);
+//     }
+//     else
+//       e = sampleFromVector(e->head_->in_edges, generator_);
+//     if (e->even() == STAR && e->odd() == STAR)
+//       vec.push_back(e);
+//     e->incrementEven();
+//     if (!edges_[e->tail_->index][u0->index - adjacency_matrix_.nrow()].fixed_)
+//       e = &edges_[e->tail_->index][u0->index - adjacency_matrix_.nrow()];
+//     else
+//       e = sampleNewFromVector(e->tail_->out_edges, e, generator_);
+//     if (e->even() == STAR && e->odd() == STAR)
+//       vec.push_back(e);
+//     e->incrementOdd();
+//   }
+//   return 0;
+// }
 
 DeltaRange Graph::getDeltaRange(vector<Edge *> &vec)
 {
@@ -148,6 +196,7 @@ void Graph::updateWeights(vector<Edge *> &vec, int delta)
 }
 
 
+
 void Graph::sampleStep()
 {
   // reserve space in here to avoid reallocations!!
@@ -160,11 +209,16 @@ void Graph::sampleStep()
     return;
   }
   DeltaRange dr = getDeltaRange(cycle);
+  Rcout << "Delta Range: " << "[" << dr.low << "," << dr.up << "]" << endl;
   Factor factor = getBoundaryWeights(cycle, dr);
+  Rcout << "Factor: " << "[" << factor.low << "," << factor.up << "]" << endl;
   int delta = sampleDelta(dr, factor, generator_);
+  Rcout << "Delta: " << delta << endl;
   updateWeights(cycle, delta);
   reset(cycle);
 }
+
+
 
 void Graph::updateAdjacencyMatrix()
 {
@@ -218,7 +272,6 @@ Factor Graph::getBoundaryWeights(const vector<Edge *> &vec, const DeltaRange& dr
   }
   return factor;
 }
-
 
 
 void getVerticesCycleData(const vector<Edge *> &vec, const DeltaRange& dr)

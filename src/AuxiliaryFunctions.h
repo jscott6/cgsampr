@@ -15,7 +15,7 @@
 void printMatrix(const Rcpp::IntegerMatrix mat);
 void printVertexData(const Weighted::Vertex &v);
 void printEdgeData(const Weighted::Edge &e);
-Rcpp::IntegerMatrix constructGraph(Rcpp::IntegerVector, Rcpp::IntegerVector, Rcpp::IntegerMatrix);
+Rcpp::IntegerMatrix constructGraph(Rcpp::IntegerVector, Rcpp::IntegerVector, Rcpp::IntegerMatrix, bool weighted);
 void checkInputs(Rcpp::IntegerVector, Rcpp::IntegerVector, Rcpp::IntegerMatrix);
 // prints a vector to output stream (assumes T printable)
 template <class T>

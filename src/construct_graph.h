@@ -30,7 +30,7 @@ namespace ConstructGraph {
 
   class Graph {
 public:
-    Graph(IV, IV, IM);
+    Graph(IV, IV, IM, bool);
     void addEdge(int, int, int);
     bool findPath();
     int calcPathFlow();

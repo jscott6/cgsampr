@@ -141,17 +141,22 @@ void printVertexData(const Unweighted::Vertex &v)
 }
 
 // [[Rcpp::export]]
-IM constructGraph(IV out_degree, IV in_degree, IM fixed)
+IM constructGraph(IV out_degree, IV in_degree, IM fixed, bool weighted)
 {
   checkInputs(in_degree, out_degree, fixed);
   bool sinkfound = true;
-  ConstructGraph::Graph net(out_degree, in_degree, fixed);
+  ConstructGraph::Graph net(out_degree, in_degree, fixed, weighted);
   // adjust flow until no path remains in the residual Graph
   while (sinkfound) {
     sinkfound = net.findPath();
     net.updateFlow(net.calcPathFlow());
   }
-  return net.constructWeightMatrix();
+  IM adjacency_matrix = net.constructWeightMatrix();
+  if(is_true(all(rowSums(adjacency_matrix) == out_degree)) &&
+     is_true(all(colSums(adjacency_matrix) == in_degree)))
+    return adjacency_matrix;
+  else
+    throw invalid_argument("No graph is compatible with inputs provided");
 }
 
 void checkInputs(IV in_degree, IV out_degree, IM fixed) {

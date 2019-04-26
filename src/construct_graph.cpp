@@ -12,8 +12,11 @@ void Graph::addEdge(int i, int j, int capacity){
   capacity_[i][j] = capacity;
 }
 
-Graph::Graph(IV out_degree, IV in_degree, IM fixed)
+Graph::Graph(IV out_degree, IV in_degree, IM fixed, bool weighted)
 {
+
+  int cap = 1;
+  if(weighted) cap = INT_MAX;
 
   m_ = out_degree.size();
   n_ = in_degree.size();
@@ -45,7 +48,7 @@ Graph::Graph(IV out_degree, IV in_degree, IM fixed)
         // only add an edge if not fixed
         if (!fixed(i,j))
         {
-            addEdge(i + 1, m_ + j + 1, 1);
+            addEdge(i + 1, m_ + j + 1, cap);
             addEdge(m_ + j + 1, i + 1, 0);   
         }
     
