@@ -4,6 +4,7 @@
 #include <Rcpp.h>
 #include <vector>
 #include <random>
+#include <chrono>
 
 #define pure = 0;
 
