@@ -37,10 +37,12 @@ namespace Base {
     virtual void sampleStep();
     IM adjacency_matrix() { return adjacency_matrix_; }
     IM fixed() { return fixed_; }
+    double mixing() { return mixing_; }
   protected:
     IM adjacency_matrix_, fixed_;
     std::default_random_engine generator_;
     virtual void updateAdjacencyMatrix();
+    double mixing_;
   };
 
 

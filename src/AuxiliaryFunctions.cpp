@@ -29,7 +29,6 @@ void printEdgeData(const Weighted::Edge &e)
 {
   Rcout << "Edge: " << e.tail_->index + 1 << "->" << e.head_->index + 1 << endl;
   Rcout << "Weight: " << e.weight() << endl;
-  Rcout << "even: " << e.even() << " odd: " << e.odd() << endl;
   Rcout << endl;
 }
 
@@ -83,13 +82,9 @@ void printVertexData(const Weighted::Vertex &v)
   }
   Rcout << endl;
   Rcout << endl;
-  Rcout << setw(8) << "Possible Out Edges" << endl;
-  Rcout << "------------" << endl;
-  Rcout << "visits: " << v.cycle_data.visits << endl;
-  Rcout << "up_zero_visits: " << v.cycle_data.up_zero_visits << endl;
-  Rcout << "low_zero_visits: " << v.cycle_data.low_zero_visits << endl;
-  Rcout << "up_zeros: " << v.cycle_data.up_zeros << endl;
-  Rcout << "low_zeros: " << v.cycle_data.low_zeros << endl;
+  Rcout << "n_int:" << v.n_int << endl;
+  Rcout << "n_up:" << v.n_up << endl;
+  Rcout << "n_low:" << v.n_low << endl;
   return;
 }
 

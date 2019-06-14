@@ -51,6 +51,8 @@ void Graph::DFS() {
   vector<Vertex> sorted_vertices = vertices;
   sort(sorted_vertices.begin(), sorted_vertices.end(), compareVertexFinishTimes);
 
+  //sort(vertices.begin(), vertices.end(), compareVertexFinishTimes);
+
   for (auto &v: vertices) {
     v.color = white;
     v.predecessor = 0;
@@ -58,7 +60,7 @@ void Graph::DFS() {
 
   unsigned int time=0, tree=0;
   // for each Vertex, if white visit all edges via DFSVisit
-  for (auto &v: vertices) {
+  for (auto &v: sorted_vertices) {
     if (vertices[v.name].color == white) {
       ++tree;
       time = DFSVisit(v.name, time, tree);

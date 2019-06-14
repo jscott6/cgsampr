@@ -85,6 +85,7 @@ void Graph::sampleStep()
         return;
     DeltaRange dr = getDeltaRange(cycle);
     int delta = sampleDelta(dr, generator_);
+    if (delta != 0) mixing_ = mixing_ + 1.;
     updateWeights(cycle, delta);
     return;
 }

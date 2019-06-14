@@ -22,6 +22,8 @@ void checks(IM adjacency_matrix, IM fixed) {
     throw invalid_argument("Graph fully determined by specification");
 }
 
+ 
+// [[Rcpp::export]]
 IM initFixed(IM adjacency_matrix, IM fixed, bool search) {
     checks(adjacency_matrix, fixed);
     if(!search) return fixed;
@@ -37,18 +39,21 @@ default_random_engine initGenerator() {
 Graph::Graph(IM adjacency_matrix, IM fixed, bool search)
   : adjacency_matrix_(clone(adjacency_matrix)),
     fixed_(initFixed(adjacency_matrix, fixed, search)),
-    generator_(initGenerator()) 
+    generator_(initGenerator()),
+    mixing_(0.) 
     { checks(adjacency_matrix_, fixed_); }
 
 List Graph::sample(int nsamples, int thin, int burnin) {
 
   List results(nsamples);
+  mixing_ = 0.;
   for (int i = 0; i != nsamples; ++i) {
     for (int j = 0; j != (thin + 1); ++j)
       sampleStep();
     updateAdjacencyMatrix();
     results(i) = clone(adjacency_matrix_);
   }
+  mixing_ = mixing_ / (double) (nsamples*thin);
   return results;
 }
 

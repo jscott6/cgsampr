@@ -22,7 +22,8 @@ RCPP_MODULE(graph_module)
   class_<Base::Graph>("Base")
       .method("sample", &Base::Graph::sample, "Performs multiple sampling steps with optional thinning and burnin period")
       .property("adjacency_matrix", &Base::Graph::adjacency_matrix, "Returns Graph biadjacency matrix")
-      .property("fixed", &Base::Graph::fixed, "Returns binary matrix specifying fixed edges/non-edges");
+      .property("fixed", &Base::Graph::fixed, "Returns binary matrix specifying fixed edges/non-edges")
+      .property("mixing", &Base::Graph::mixing, "Returns mixing rate of the previous sampling step");
 
   class_<Weighted::Directed::SG::Graph>("WeightedSGGraph")
       .derives<Base::Graph>("Base")
